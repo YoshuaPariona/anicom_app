@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "727775604654",
+    "project_id": "anicom-app",
+    "storage_bucket": "anicom-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:727775604654:android:0293301eb2e39a754ba23f",
+        "android_client_info": {
+          "package_name": "com.example.anicom_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTmv0Yczpdkqzefwiwq9K5XL4Ur9sILQs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
