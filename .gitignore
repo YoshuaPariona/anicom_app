@@ -61,5 +61,21 @@ coverage/
 *.ipr
 *.iws
 
+# Archivos generados automáticamente - Linux
+linux/flutter/generated_plugin_registrant.*
+linux/flutter/generated_plugins.cmake
+linux/flutter/ephemeral/
+
+# Archivos generados automáticamente - macOS
+macos/Flutter/GeneratedPluginRegistrant.swift
+macos/Flutter/ephemeral/
+macos/Pods/
+macos/Podfile.lock
+
+# Archivos generados automáticamente - Windows
+windows/flutter/generated_plugin_registrant.*
+windows/flutter/generated_plugins.cmake
+windows/flutter/ephemeral/
+
 # Google services
 android/app/google-services.json
