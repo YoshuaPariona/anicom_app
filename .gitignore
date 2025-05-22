@@ -60,3 +60,6 @@ coverage/
 *.iml
 *.ipr
 *.iws
+
+# Google services
+android/app/google-services.json
