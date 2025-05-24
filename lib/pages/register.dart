@@ -46,7 +46,9 @@ class RegisterPage extends StatelessWidget {
                   ),
                   SizedBox(height: 40),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/insertarProductoPage');
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFFA96B5A),
                       foregroundColor: Colors.white,

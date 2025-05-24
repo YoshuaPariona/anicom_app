@@ -1,47 +1,51 @@
-/*
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_database/firebase_database.dart'; // Aún necesario si usarás RTDB
-import 'package:cloud_firestore/cloud_firestore.dart'; // Necesario para Firestore
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp(const MainApp());
-}
-
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class ProductFirebase extends StatefulWidget {
+  const ProductFirebase({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(home: ListaProductos());
-  }
+  State<ProductFirebase> createState() => _ProductFirebaseState();
 }
 
-class ListaProductos extends StatefulWidget {
-  const ListaProductos({super.key});
-
-  @override
-  State<ListaProductos> createState() => _ListaProductosState();
-}
-
-class _ListaProductosState extends State<ListaProductos> {
+class _ProductFirebaseState extends State<ProductFirebase> {
   List<Map<String, dynamic>> productos = [];
+
+  final List<String> colecciones = [
+    'comida',
+    'ropa',
+    'accesorios',
+    'figuras',
+    'cosplay',
+  ];
 
   @override
   void initState() {
     super.initState();
-    obtenerProductos();
+    obtenerTodosLosProductos();
   }
 
-  Future<void> obtenerProductos() async {
+  Future<void> obtenerTodosLosProductos() async {
     try {
-      final snapshot =
-          await FirebaseFirestore.instance.collection('productos').get();
+      List<Map<String, dynamic>> todosLosProductos = [];
+
+      for (String coleccion in colecciones) {
+        final snapshot =
+            await FirebaseFirestore.instance.collection(coleccion).get();
+
+        final productosDeColeccion = snapshot.docs.map((doc) {
+          return {
+            'id': doc.id,
+            'categoria': coleccion,
+            ...doc.data(),
+          };
+        }).toList();
+
+        todosLosProductos.addAll(productosDeColeccion);
+      }
+
       setState(() {
-        productos =
-            snapshot.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList();
+        productos = todosLosProductos;
       });
     } catch (e) {
       print('Error al obtener productos: $e');
@@ -63,39 +67,31 @@ class _ListaProductosState extends State<ListaProductos> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Lista de Productos')),
-      body:
-          productos.isEmpty
-              ? const Center(child: CircularProgressIndicator())
-              : ListView.builder(
-                itemCount: productos.length,
-                itemBuilder: (context, index) {
-                  final producto = productos[index];
-                  final urlImagenOriginal = producto['imagen'] as String? ?? '';
-                  final urlImagenDirecta = convertirEnlaceDriveADirecto(
-                    urlImagenOriginal,
-                  );
-                  return ListTile(
-                    leading:
-                        urlImagenOriginal.isNotEmpty
-                            ? Image.network(
-                              urlImagenDirecta,
-                              width: 50,
-                              height: 50,
-                              fit: BoxFit.cover,
-                              errorBuilder:
-                                  (context, error, stackTrace) =>
-                                      const Icon(Icons.broken_image),
-                            )
-                            : const Icon(Icons.image_not_supported),
-                    title: Text(producto['nombre'] ?? 'Sin nombre'),
-                    subtitle: Text(
-                      'Precio: S/ ${producto['precio'] ?? '0.00'}',
-                    ),
-                    trailing: Text('ID: ${producto['id']}'),
-                  );
-                },
-              ),
+      body: productos.isEmpty
+          ? const Center(child: CircularProgressIndicator())
+          : ListView.builder(
+              itemCount: productos.length,
+              itemBuilder: (context, index) {
+                final producto = productos[index];
+                final urlImagenOriginal = producto['imagen'] as String? ?? '';
+                final urlImagenDirecta = convertirEnlaceDriveADirecto(urlImagenOriginal);
+                return ListTile(
+                  leading: urlImagenOriginal.isNotEmpty
+                      ? Image.network(
+                          urlImagenDirecta,
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(Icons.broken_image),
+                        )
+                      : const Icon(Icons.image_not_supported),
+                  title: Text(producto['nombre'] ?? 'Sin nombre'),
+                  subtitle: Text('Precio: S/ ${producto['precio'] ?? '0.00'}\nCategoría: ${producto['categoria']}'),
+                  trailing: Text('ID: ${producto['id']}'),
+                );
+              },
+            ),
     );
   }
 }
-*/

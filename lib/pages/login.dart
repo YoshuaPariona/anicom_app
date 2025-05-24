@@ -38,7 +38,9 @@ class LoginPage extends StatelessWidget {
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/productFirebase');
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFFA96B5A),
                       foregroundColor: Colors.white,
