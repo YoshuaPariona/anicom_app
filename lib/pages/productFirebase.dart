@@ -10,6 +10,8 @@ class ProductFirebase extends StatefulWidget {
 
 class _ProductFirebaseState extends State<ProductFirebase> {
   List<Map<String, dynamic>> productos = [];
+  String filtroCategoria = 'todos';
+  String busqueda = '';
 
   final List<String> colecciones = [
     'comida',
@@ -65,33 +67,100 @@ class _ProductFirebaseState extends State<ProductFirebase> {
 
   @override
   Widget build(BuildContext context) {
+    // Filtrar por categoría y búsqueda
+    final productosFiltrados = productos.where((producto) {
+      final nombre = producto['nombre']?.toString().toLowerCase() ?? '';
+      final coincideBusqueda = nombre.contains(busqueda.toLowerCase());
+      final coincideCategoria =
+          filtroCategoria == 'todos' || producto['categoria'] == filtroCategoria;
+      return coincideBusqueda && coincideCategoria;
+    }).toList();
+
     return Scaffold(
       appBar: AppBar(title: const Text('Lista de Productos')),
-      body: productos.isEmpty
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: productos.length,
-              itemBuilder: (context, index) {
-                final producto = productos[index];
-                final urlImagenOriginal = producto['imagen'] as String? ?? '';
-                final urlImagenDirecta = convertirEnlaceDriveADirecto(urlImagenOriginal);
-                return ListTile(
-                  leading: urlImagenOriginal.isNotEmpty
-                      ? Image.network(
-                          urlImagenDirecta,
-                          width: 50,
-                          height: 50,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              const Icon(Icons.broken_image),
-                        )
-                      : const Icon(Icons.image_not_supported),
-                  title: Text(producto['nombre'] ?? 'Sin nombre'),
-                  subtitle: Text('Precio: S/ ${producto['precio'] ?? '0.00'}\nCategoría: ${producto['categoria']}'),
-                  trailing: Text('ID: ${producto['id']}'),
-                );
+      body: Column(
+        children: [
+          // Campo de búsqueda
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              decoration: const InputDecoration(
+                hintText: 'Buscar producto...',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  busqueda = value;
+                });
               },
             ),
+          ),
+          // Botones de colección
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Row(
+              children: [
+                ChoiceChip(
+                  label: const Text('Todos'),
+                  selected: filtroCategoria == 'todos',
+                  onSelected: (_) {
+                    setState(() {
+                      filtroCategoria = 'todos';
+                    });
+                  },
+                ),
+                const SizedBox(width: 8),
+                ...colecciones.map((coleccion) => Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        label: Text(coleccion),
+                        selected: filtroCategoria == coleccion,
+                        onSelected: (_) {
+                          setState(() {
+                            filtroCategoria = coleccion;
+                          });
+                        },
+                      ),
+                    )),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          // Lista de productos filtrados
+          Expanded(
+            child: productosFiltrados.isEmpty
+                ? const Center(child: Text('No se encontraron productos'))
+                : ListView.builder(
+                    itemCount: productosFiltrados.length,
+                    itemBuilder: (context, index) {
+                      final producto = productosFiltrados[index];
+                      final urlImagenOriginal = producto['imagen'] as String? ?? '';
+                      final urlImagenDirecta =
+                          convertirEnlaceDriveADirecto(urlImagenOriginal);
+
+                      return ListTile(
+                        leading: urlImagenOriginal.isNotEmpty
+                            ? Image.network(
+                                urlImagenDirecta,
+                                width: 50,
+                                height: 50,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    const Icon(Icons.broken_image),
+                              )
+                            : const Icon(Icons.image_not_supported),
+                        title: Text(producto['nombre'] ?? 'Sin nombre'),
+                        subtitle: Text(
+                            'Precio: S/ ${producto['precio'] ?? '0.00'}\nCategoría: ${producto['categoria']}'),
+                        trailing: Text('ID: ${producto['id']}'),
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }
