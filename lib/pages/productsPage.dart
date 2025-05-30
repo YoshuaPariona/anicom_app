@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class ProductFirebase extends StatefulWidget {
-  const ProductFirebase({super.key});
+class ProductsPage extends StatefulWidget {
+  const ProductsPage({super.key});
 
   @override
-  State<ProductFirebase> createState() => _ProductFirebaseState();
+  State<ProductsPage> createState() => _ProductsPageState();
 }
 
-class _ProductFirebaseState extends State<ProductFirebase> {
-  List<Map<String, dynamic>> productos = [];
-  String filtroCategoria = 'todos';
-  String busqueda = '';
+class _ProductsPageState extends State<ProductsPage> {
+  List<Map<String, dynamic>> products = [];
+  String categoryFilter = 'todos';
+  String searchQuery = '';
 
-  final List<String> colecciones = [
+  final List<String> categories = [
     'comida',
     'ropa',
     'accesorios',
@@ -24,60 +24,58 @@ class _ProductFirebaseState extends State<ProductFirebase> {
   @override
   void initState() {
     super.initState();
-    obtenerTodosLosProductos();
+    fetchAllProducts();
   }
 
-  Future<void> obtenerTodosLosProductos() async {
+  Future<void> fetchAllProducts() async {
     try {
-      List<Map<String, dynamic>> todosLosProductos = [];
+      List<Map<String, dynamic>> allProducts = [];
 
-      for (String coleccion in colecciones) {
+      for (String category in categories) {
         final snapshot =
-            await FirebaseFirestore.instance.collection(coleccion).get();
+            await FirebaseFirestore.instance.collection(category).get();
 
-        final productosDeColeccion = snapshot.docs.map((doc) {
+        final productsFromCollection = snapshot.docs.map((doc) {
           return {
             'id': doc.id,
-            'categoria': coleccion,
+            'categoria': category,
             ...doc.data(),
           };
         }).toList();
 
-        todosLosProductos.addAll(productosDeColeccion);
+        allProducts.addAll(productsFromCollection);
       }
 
       setState(() {
-        productos = todosLosProductos;
+        products = allProducts;
       });
     } catch (e) {
       print('Error al obtener productos: $e');
     }
   }
 
-  String convertirEnlaceDriveADirecto(String enlaceDrive) {
+  String convertDriveLinkToDirect(String driveLink) {
     final regExp = RegExp(r'/d/([a-zA-Z0-9_-]+)');
-    final match = regExp.firstMatch(enlaceDrive);
+    final match = regExp.firstMatch(driveLink);
     if (match != null && match.groupCount >= 1) {
       final id = match.group(1);
       return 'https://drive.google.com/uc?export=view&id=$id';
     } else {
-      return enlaceDrive;
+      return driveLink;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Filtrar por categoría y búsqueda
-    final productosFiltrados = productos.where((producto) {
-      final nombre = producto['nombre']?.toString().toLowerCase() ?? '';
-      final coincideBusqueda = nombre.contains(busqueda.toLowerCase());
-      final coincideCategoria =
-          filtroCategoria == 'todos' || producto['categoria'] == filtroCategoria;
-      return coincideBusqueda && coincideCategoria;
+    final filteredProducts = products.where((product) {
+      final name = product['nombre']?.toString().toLowerCase() ?? '';
+      final matchesSearch = name.contains(searchQuery.toLowerCase());
+      final matchesCategory =
+          categoryFilter == 'todos' || product['categoria'] == categoryFilter;
+      return matchesSearch && matchesCategory;
     }).toList();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Lista de Productos')),
       body: Column(
         children: [
           // Campo de búsqueda
@@ -91,12 +89,12 @@ class _ProductFirebaseState extends State<ProductFirebase> {
               ),
               onChanged: (value) {
                 setState(() {
-                  busqueda = value;
+                  searchQuery = value;
                 });
               },
             ),
           ),
-          // Botones de colección
+          // Botones de categorías
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -104,22 +102,22 @@ class _ProductFirebaseState extends State<ProductFirebase> {
               children: [
                 ChoiceChip(
                   label: const Text('Todos'),
-                  selected: filtroCategoria == 'todos',
+                  selected: categoryFilter == 'todos',
                   onSelected: (_) {
                     setState(() {
-                      filtroCategoria = 'todos';
+                      categoryFilter = 'todos';
                     });
                   },
                 ),
                 const SizedBox(width: 8),
-                ...colecciones.map((coleccion) => Padding(
+                ...categories.map((category) => Padding(
                       padding: const EdgeInsets.only(right: 8),
                       child: ChoiceChip(
-                        label: Text(coleccion),
-                        selected: filtroCategoria == coleccion,
+                        label: Text(category),
+                        selected: categoryFilter == category,
                         onSelected: (_) {
                           setState(() {
-                            filtroCategoria = coleccion;
+                            categoryFilter = category;
                           });
                         },
                       ),
@@ -128,22 +126,22 @@ class _ProductFirebaseState extends State<ProductFirebase> {
             ),
           ),
           const SizedBox(height: 10),
-          // Lista de productos filtrados
+          // Lista de productos
           Expanded(
-            child: productosFiltrados.isEmpty
+            child: filteredProducts.isEmpty
                 ? const Center(child: Text('No se encontraron productos'))
                 : ListView.builder(
-                    itemCount: productosFiltrados.length,
+                    itemCount: filteredProducts.length,
                     itemBuilder: (context, index) {
-                      final producto = productosFiltrados[index];
-                      final urlImagenOriginal = producto['imagen'] as String? ?? '';
-                      final urlImagenDirecta =
-                          convertirEnlaceDriveADirecto(urlImagenOriginal);
+                      final product = filteredProducts[index];
+                      final originalImageUrl = product['imagen'] as String? ?? '';
+                      final directImageUrl =
+                          convertDriveLinkToDirect(originalImageUrl);
 
                       return ListTile(
-                        leading: urlImagenOriginal.isNotEmpty
+                        leading: originalImageUrl.isNotEmpty
                             ? Image.network(
-                                urlImagenDirecta,
+                                directImageUrl,
                                 width: 50,
                                 height: 50,
                                 fit: BoxFit.cover,
@@ -151,10 +149,10 @@ class _ProductFirebaseState extends State<ProductFirebase> {
                                     const Icon(Icons.broken_image),
                               )
                             : const Icon(Icons.image_not_supported),
-                        title: Text(producto['nombre'] ?? 'Sin nombre'),
+                        title: Text(product['nombre'] ?? 'Sin nombre'),
                         subtitle: Text(
-                            'Precio: S/ ${producto['precio'] ?? '0.00'}\nCategoría: ${producto['categoria']}'),
-                        trailing: Text('ID: ${producto['id']}'),
+                            'Precio: S/ ${product['precio'] ?? '0.00'}\nCategoría: ${product['categoria']}'),
+                        trailing: Text('ID: ${product['id']}'),
                       );
                     },
                   ),

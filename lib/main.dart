@@ -1,9 +1,9 @@
 import 'package:anicom_app/pages/login.dart';
 import 'package:anicom_app/pages/register.dart';
 import 'package:anicom_app/pages/welcome.dart';
-import 'package:anicom_app/pages/productFirebase.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:anicom_app/pages/homepage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,7 +15,7 @@ void main() async {
       '/': (context) => WelcomePage(),
       '/login': (context) => LoginPage(),
       '/register': (context) => RegisterPage(),
-      '/productFirebase': (context) => ProductFirebase()
+      '/home': (context) => HomePage(),
     },
   ));
 }
