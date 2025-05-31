@@ -16,7 +16,6 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CartProvider()),
-        // aquí puedes agregar más providers si necesitas
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

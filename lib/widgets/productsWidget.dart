@@ -1,9 +1,10 @@
+// ... otros imports
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:anicom_app/models/product.dart';
 import 'package:anicom_app/providers/cartProvider.dart';
-import 'package:anicom_app/widgets/cartWidget.dart';
-import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:provider/provider.dart';
 
 class ProductsWidget extends StatefulWidget {
   const ProductsWidget({super.key});
@@ -13,6 +14,7 @@ class ProductsWidget extends StatefulWidget {
 }
 
 class _ProductsWidgetState extends State<ProductsWidget> {
+  Set<String> recentlyAddedProducts = {};
   List<Map<String, dynamic>> products = [];
   String categoryFilter = 'todos';
   String searchQuery = '';
@@ -143,18 +145,6 @@ class _ProductsWidgetState extends State<ProductsWidget> {
                           convertDriveLinkToDirect(originalImageUrl);
 
                       return ListTile(
-                        onTap: () {
-                          final producto = Product.fromMap(product);
-
-                          // Añadir al carrito usando provider
-                          Provider.of<CartProvider>(context, listen: false).addProduct(producto);
-
-                          // Aquí no navegamos a la página carrito
-                          // Puedes mostrar un snackbar para confirmar la adición:
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('${producto.nombre} añadido al carrito')),
-                          );
-                        },
                         leading: originalImageUrl.isNotEmpty
                             ? Image.network(
                                 directImageUrl,
@@ -168,7 +158,53 @@ class _ProductsWidgetState extends State<ProductsWidget> {
                         title: Text(product['nombre'] ?? 'Sin nombre'),
                         subtitle: Text(
                             'Precio: S/ ${product['precio'] ?? '0.00'}\nCategoría: ${product['categoria']}'),
-                        trailing: Text('ID: ${product['id']}'),
+                        trailing: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          transitionBuilder: (child, animation) {
+                            return ScaleTransition(scale: animation, child: child);
+                          },
+                          child: recentlyAddedProducts.contains(product['id'])
+                              ? SizedBox(
+                                  key: const ValueKey('icon'),
+                                  width: 100, // igual que el ancho del botón
+                                  height: 40, // igual que la altura del botón
+                                  child: const Center(
+                                    child: Icon(
+                                      Icons.check_circle,
+                                      color: Colors.green,
+                                      size: 28,
+                                    ),
+                                  ),
+                                )
+                              : SizedBox(
+                                  key: const ValueKey('button'),
+                                  width: 100, // igual ancho que el ícono
+                                  height: 40,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      final producto = Product.fromMap(product);
+
+                                      Provider.of<CartProvider>(context, listen: false).addProduct(producto);
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('${producto.nombre} añadido al carrito')),
+                                      );
+
+                                      setState(() {
+                                        recentlyAddedProducts.add(product['id']);
+                                      });
+                                      Future.delayed(const Duration(seconds: 1), () {
+                                        setState(() {
+                                          recentlyAddedProducts.remove(product['id']);
+                                        });
+                                      });
+                                    },
+                                    child: const Text('Agregar'),
+                                  ),
+                                ),
+                        ),
+
+
+
                       );
                     },
                   ),
@@ -178,64 +214,3 @@ class _ProductsWidgetState extends State<ProductsWidget> {
     );
   }
 }
-
-class _CartItem extends StatelessWidget {
-  final String imageUrl;
-  final String name;
-  final double price;
-  final int quantity;
-  final VoidCallback onIncrement;
-  final VoidCallback onDecrement;
-
-  const _CartItem({
-    required this.imageUrl,
-    required this.name,
-    required this.price,
-    required this.quantity,
-    required this.onIncrement,
-    required this.onDecrement,
-    super.key,
-  });
-
-  String convertDriveLinkToDirect(String driveLink) {
-      final regExp = RegExp(r'/d/([a-zA-Z0-9_-]+)');
-      final match = regExp.firstMatch(driveLink);
-      if (match != null && match.groupCount >= 1) {
-        final id = match.group(1);
-        return 'https://drive.google.com/uc?export=view&id=$id';
-      } else {
-        return driveLink;
-      }
-    }
-
-  @override
-  Widget build(BuildContext context) {
-    final directImageUrl = convertDriveLinkToDirect(imageUrl);
-
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: ListTile(
-        leading: directImageUrl.isNotEmpty
-            ? Image.network(
-                directImageUrl,
-                width: 60,
-                height: 60,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
-              )
-            : const Icon(Icons.image_not_supported),
-        title: Text(name),
-        subtitle: Text('Precio: S/ ${price.toStringAsFixed(2)}'),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(icon: const Icon(Icons.remove_circle_outline), onPressed: onDecrement),
-            Text('$quantity'),
-            IconButton(icon: const Icon(Icons.add_circle_outline), onPressed: onIncrement),
-          ],
-        ),
-      ),
-    );
-  }
-}
-

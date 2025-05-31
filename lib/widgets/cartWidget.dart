@@ -11,7 +11,7 @@ class CartWidget extends StatelessWidget {
 
     final items = cart.items;
     return Scaffold(
-      backgroundColor: const Color(0xFFF4DFF4),
+      
       body: SafeArea(
         child: Column(
   children: [
@@ -82,6 +82,7 @@ class CartWidget extends StatelessWidget {
                       },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFA16759),
+                  foregroundColor: Colors.white,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                   shape: RoundedRectangleBorder(
@@ -139,6 +140,7 @@ class _CartItem extends StatelessWidget {
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
+      color: const Color(0xFFF4DFF4),
       child: ListTile(
         leading: directImageUrl.isNotEmpty
             ? Image.network(
