@@ -1,14 +1,18 @@
+import 'package:anicom_app/models/product.dart';
+import 'package:anicom_app/providers/cartProvider.dart';
+import 'package:anicom_app/widgets/cartWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 
-class ProductsPage extends StatefulWidget {
-  const ProductsPage({super.key});
+class ProductsWidget extends StatefulWidget {
+  const ProductsWidget({super.key});
 
   @override
-  State<ProductsPage> createState() => _ProductsPageState();
+  State<ProductsWidget> createState() => _ProductsWidgetState();
 }
 
-class _ProductsPageState extends State<ProductsPage> {
+class _ProductsWidgetState extends State<ProductsWidget> {
   List<Map<String, dynamic>> products = [];
   String categoryFilter = 'todos';
   String searchQuery = '';
@@ -129,7 +133,7 @@ class _ProductsPageState extends State<ProductsPage> {
           // Lista de productos
           Expanded(
             child: filteredProducts.isEmpty
-                ? const Center(child: Text('No se encontraron productos'))
+                ? const Center(child: Text('Cargando productos . . .'))
                 : ListView.builder(
                     itemCount: filteredProducts.length,
                     itemBuilder: (context, index) {
@@ -139,6 +143,18 @@ class _ProductsPageState extends State<ProductsPage> {
                           convertDriveLinkToDirect(originalImageUrl);
 
                       return ListTile(
+                        onTap: () {
+                          final producto = Product.fromMap(product);
+
+                          // Añadir al carrito usando provider
+                          Provider.of<CartProvider>(context, listen: false).addProduct(producto);
+
+                          // Aquí no navegamos a la página carrito
+                          // Puedes mostrar un snackbar para confirmar la adición:
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('${producto.nombre} añadido al carrito')),
+                          );
+                        },
                         leading: originalImageUrl.isNotEmpty
                             ? Image.network(
                                 directImageUrl,
@@ -162,3 +178,64 @@ class _ProductsPageState extends State<ProductsPage> {
     );
   }
 }
+
+class _CartItem extends StatelessWidget {
+  final String imageUrl;
+  final String name;
+  final double price;
+  final int quantity;
+  final VoidCallback onIncrement;
+  final VoidCallback onDecrement;
+
+  const _CartItem({
+    required this.imageUrl,
+    required this.name,
+    required this.price,
+    required this.quantity,
+    required this.onIncrement,
+    required this.onDecrement,
+    super.key,
+  });
+
+  String convertDriveLinkToDirect(String driveLink) {
+      final regExp = RegExp(r'/d/([a-zA-Z0-9_-]+)');
+      final match = regExp.firstMatch(driveLink);
+      if (match != null && match.groupCount >= 1) {
+        final id = match.group(1);
+        return 'https://drive.google.com/uc?export=view&id=$id';
+      } else {
+        return driveLink;
+      }
+    }
+
+  @override
+  Widget build(BuildContext context) {
+    final directImageUrl = convertDriveLinkToDirect(imageUrl);
+
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: ListTile(
+        leading: directImageUrl.isNotEmpty
+            ? Image.network(
+                directImageUrl,
+                width: 60,
+                height: 60,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image),
+              )
+            : const Icon(Icons.image_not_supported),
+        title: Text(name),
+        subtitle: Text('Precio: S/ ${price.toStringAsFixed(2)}'),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(icon: const Icon(Icons.remove_circle_outline), onPressed: onDecrement),
+            Text('$quantity'),
+            IconButton(icon: const Icon(Icons.add_circle_outline), onPressed: onIncrement),
+          ],
+        ),
+      ),
+    );
+  }
+}
+

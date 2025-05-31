@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class RegisterPage extends StatelessWidget {
+class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -10,7 +10,7 @@ class RegisterPage extends StatelessWidget {
         child: Column(
           children: [
             SizedBox(height: 50),
-            Image.network('https://drive.google.com/uc?export=download&id=1SHwtn8NNKhbqxXEmC8FuRJ52LzHF8t1L', width: 250),
+            Image.asset('assets/logo.png', width: 250),
             SizedBox(height: 30),
             Container(
               padding: EdgeInsets.all(20),
@@ -29,25 +29,17 @@ class RegisterPage extends StatelessWidget {
                   ),
                   SizedBox(height: 20),
                   TextField(
-                    decoration: InputDecoration(labelText: 'Usuario'),
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                  TextField(
-                    decoration: InputDecoration(labelText: 'Correo'),
+                    decoration: InputDecoration(labelText: 'Usuario o correo'),
                     keyboardType: TextInputType.emailAddress,
                   ),
                   TextField(
                     obscureText: true,
                     decoration: InputDecoration(labelText: 'Contraseña'),
                   ),
-                  TextField(
-                    obscureText: true,
-                    decoration: InputDecoration(labelText: 'Repetir contraseña'),
-                  ),
-                  SizedBox(height: 40),
+                  SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, '/insertarProductoPage');
+                      Navigator.pushNamed(context, '/home');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFFA96B5A),
@@ -58,24 +50,24 @@ class RegisterPage extends StatelessWidget {
                     ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 12.0),
-                      child: Text('Registrarse'),
+                      child: Text('Iniciar Sesión'),
                     ),
                   ),
-                  SizedBox(height: 10),
-                  ElevatedButton(
+                  TextButton(
                     onPressed: () {
-                      Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+                      Navigator.pushNamed(context, '/register');
                     },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.pink,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                    child: RichText(
+                      text: TextSpan(
+                        text: '¿No tienes una cuenta? ',
+                        style: TextStyle(color: Colors.black),
+                        children: [
+                          TextSpan(
+                            text: 'Regístrate',
+                            style: TextStyle(color: Colors.pink),
+                          ),
+                        ],
                       ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12.0),
-                      child: Text('Regresar'),
                     ),
                   ),
                 ],

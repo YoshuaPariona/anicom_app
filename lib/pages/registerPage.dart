@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class LoginPage extends StatelessWidget {
+class RegisterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -10,7 +10,7 @@ class LoginPage extends StatelessWidget {
         child: Column(
           children: [
             SizedBox(height: 50),
-            Image.network('https://drive.google.com/uc?export=view&id=1SHwtn8NNKhbqxXEmC8FuRJ52LzHF8t1L', width: 250),
+            Image.asset('assets/logo.png', width: 250),
             SizedBox(height: 30),
             Container(
               padding: EdgeInsets.all(20),
@@ -29,17 +29,25 @@ class LoginPage extends StatelessWidget {
                   ),
                   SizedBox(height: 20),
                   TextField(
-                    decoration: InputDecoration(labelText: 'Usuario o correo'),
+                    decoration: InputDecoration(labelText: 'Usuario'),
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                  TextField(
+                    decoration: InputDecoration(labelText: 'Correo'),
                     keyboardType: TextInputType.emailAddress,
                   ),
                   TextField(
                     obscureText: true,
                     decoration: InputDecoration(labelText: 'Contraseña'),
                   ),
-                  SizedBox(height: 20),
+                  TextField(
+                    obscureText: true,
+                    decoration: InputDecoration(labelText: 'Repetir contraseña'),
+                  ),
+                  SizedBox(height: 40),
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, '/home');
+                      Navigator.pushNamed(context, '/insertarProductoPage');
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFFA96B5A),
@@ -50,24 +58,24 @@ class LoginPage extends StatelessWidget {
                     ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 12.0),
-                      child: Text('Iniciar Sesión'),
+                      child: Text('Registrarse'),
                     ),
                   ),
-                  TextButton(
+                  SizedBox(height: 10),
+                  ElevatedButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, '/register');
+                      Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
                     },
-                    child: RichText(
-                      text: TextSpan(
-                        text: '¿No tienes una cuenta? ',
-                        style: TextStyle(color: Colors.black),
-                        children: [
-                          TextSpan(
-                            text: 'Regístrate',
-                            style: TextStyle(color: Colors.pink),
-                          ),
-                        ],
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.pink,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
                       ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                      child: Text('Regresar'),
                     ),
                   ),
                 ],

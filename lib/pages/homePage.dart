@@ -1,6 +1,7 @@
+import 'package:anicom_app/widgets/cartWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:anicom_app/pages/productsPage.dart';
+import 'package:anicom_app/widgets/productsWidget.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,8 +29,8 @@ class _HomePageState extends State<HomePage> {
   int currentIndex = 0;
 
   final List<Widget> pages = [
-    ProductsPage(), // Home
-    // Placeholder(), // Carrito
+    ProductsWidget(), // Home
+    CartWidget(), // Carrito
     // Placeholder(), // Mapa
     // Placeholder(), // Pedidos recientes
     // Placeholder(), // Usuario
@@ -37,7 +38,7 @@ class _HomePageState extends State<HomePage> {
 
   final List<String> titles = [
     'Inicio',
-    // 'Carrito',
+    'Carrito',
     // 'Ubicación',
     // 'Pedidos recientes',
     // 'Perfil',
@@ -46,11 +47,100 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(centerTitle: true, title: Text(titles[currentIndex])),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: pages[currentIndex],
+      appBar: AppBar(
+        
+        backgroundColor: const Color(0xFFF4DFF4),
+        centerTitle: true, 
+        automaticallyImplyLeading: true,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Center(
+                child: Text(
+                  titles[currentIndex],
+                  style: const TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            Image.asset(
+              'assets/logo.png',
+              height: 40,
+            ),
+          ],
+        ),
       ),
+      drawer: Drawer(
+        child: Column(
+          children: [
+            // Cabecera con perfil del usuario
+            Container(
+              padding: const EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 16),
+              color: const Color(0xFFF4DFF4),
+              child: Row(
+                children: [
+                  // Círculo con inicial
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundColor: Colors.white,
+                    child: Text(
+                      'A', // <- Inicial del usuario (placeholder)
+                      style: const TextStyle(
+                        fontSize: 30,
+                        color: Colors.pinkAccent,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  // Nombre de usuario
+                  const Expanded(
+                    child: Text(
+                      'anico_user', // <- Nombre de usuario (placeholder)
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+
+            // Opciones debajo
+            Expanded(
+              child: ListView(
+                children: const [
+                  ListTile(
+                    leading: Icon(Icons.language),
+                    title: Text('Lenguaje'),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.notifications),
+                    title: Text('Notificaciones'),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.settings),
+                    title: Text('Configuraciones'),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.payment),
+                    title: Text('Métodos de pago'),
+                  ),
+                  Divider(),
+                  ListTile(
+                    leading: Icon(Icons.exit_to_app),
+                    title: Text('Cerrar sesión'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      body: pages[currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
         onTap: (int index) {

@@ -18,7 +18,7 @@ class WelcomePage extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 40),
-            Image.network('https://drive.google.com/uc?export=download&id=1SHwtn8NNKhbqxXEmC8FuRJ52LzHF8t1L', width: 350),
+            Image.asset('assets/logo.png', width: 350),
             SizedBox(height: 40),
             ElevatedButton(
               onPressed: () {
