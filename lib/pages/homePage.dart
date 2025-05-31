@@ -1,5 +1,6 @@
 import 'package:anicom_app/pages/placeholder.dart';
 import 'package:anicom_app/widgets/cartWidget.dart';
+import 'package:anicom_app/widgets/mapWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:anicom_app/widgets/productsWidget.dart';
@@ -32,7 +33,7 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> pages = [
     ProductsWidget(), // Home
     CartWidget(), // Carrito
-    const PlaceholderPage(title: 'Mapa', icon: Icons.location_pin),
+    MapWidget(), // Mapa
     const PlaceholderPage(title: 'Pedidos', icon: Icons.refresh),
     const PlaceholderPage(title: 'Perfil', icon: Icons.person),
   ];
