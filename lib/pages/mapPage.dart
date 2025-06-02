@@ -5,14 +5,14 @@ import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 
-class MapWidget extends StatefulWidget {
-  const MapWidget({super.key});
+class MapPage extends StatefulWidget {
+  const MapPage({super.key});
 
   @override
-  State<MapWidget> createState() => _MapWidgetState();
+  State<MapPage> createState() => _MapPageState();
 }
 
-class _MapWidgetState extends State<MapWidget> {
+class _MapPageState extends State<MapPage> {
   LatLng? userLocation;
   LatLng? storeLocation;
   GoogleMapController? mapController;

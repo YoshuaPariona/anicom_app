@@ -6,14 +6,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:anicom_app/models/product.dart';
 import 'package:anicom_app/providers/cartProvider.dart';
 
-class ProductsWidget extends StatefulWidget {
-  const ProductsWidget({super.key});
+class ProductsPage extends StatefulWidget {
+  const ProductsPage({super.key});
 
   @override
-  State<ProductsWidget> createState() => _ProductsWidgetState();
+  State<ProductsPage> createState() => _ProductsPageState();
 }
 
-class _ProductsWidgetState extends State<ProductsWidget> {
+class _ProductsPageState extends State<ProductsPage> {
   Set<String> recentlyAddedProducts = {};
   List<Map<String, dynamic>> products = [];
   String categoryFilter = 'todos';

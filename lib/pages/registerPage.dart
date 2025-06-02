@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:anicom_app/services/auth_service.dart';
 
 class RegisterPage extends StatelessWidget {
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,39 +28,55 @@ class RegisterPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    '¡Bienvenido a Anicom!',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  ),
+                  Text('¡Bienvenido a Anicom!',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center),
                   SizedBox(height: 20),
                   TextField(
+                    controller: _usernameController,
                     decoration: InputDecoration(labelText: 'Usuario'),
-                    keyboardType: TextInputType.emailAddress,
                   ),
                   TextField(
+                    controller: _emailController,
                     decoration: InputDecoration(labelText: 'Correo'),
                     keyboardType: TextInputType.emailAddress,
                   ),
                   TextField(
+                    controller: _passwordController,
                     obscureText: true,
                     decoration: InputDecoration(labelText: 'Contraseña'),
                   ),
                   TextField(
+                    controller: _confirmPasswordController,
                     obscureText: true,
                     decoration: InputDecoration(labelText: 'Repetir contraseña'),
                   ),
                   SizedBox(height: 40),
                   ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/insertarProductoPage');
+                    onPressed: () async {
+                      if (_passwordController.text != _confirmPasswordController.text) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Las contraseñas no coinciden')),
+                        );
+                        return;
+                      }
+
+                      String? error = await AuthService().register(
+                        _usernameController.text,
+                        _emailController.text,
+                        _passwordController.text,
+                      );
+
+                      if (error == null) {
+                        Navigator.pushNamed(context, '/home');
+                      } else {
+                        print('Error de registro: $error');
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFFA96B5A),
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 12.0),
@@ -69,9 +91,7 @@ class RegisterPage extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.pink,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 12.0),

@@ -2,7 +2,7 @@ import 'package:anicom_app/providers/cartProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class CartWidget extends StatelessWidget {
+class CartPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
