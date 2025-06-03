@@ -35,9 +35,9 @@ class MyApp extends StatelessWidget {
         },
         theme:  ThemeData(
           textSelectionTheme: const TextSelectionThemeData(
-            cursorColor: Color(0xFFA96B5A),         // Color del cursor
-            selectionColor: Color(0xFFE8CFC7),      // Fondo de texto seleccionado
-            selectionHandleColor: Color(0xFFA96B5A) // Gota o "handle"
+            cursorColor: Color(0xFFA96B5A),
+            selectionColor: Color(0xFFE8CFC7),
+            selectionHandleColor: Color(0xFFA96B5A),
           ),
         ),
       ),

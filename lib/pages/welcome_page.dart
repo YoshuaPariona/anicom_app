@@ -1,9 +1,31 @@
 import 'package:flutter/material.dart';
 import '../../widgets/logo_image.dart';
 import '../../widgets/custom_button.dart';
+import '../../services/auth_service.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
+
+  Future<void> _loginAsGuest(BuildContext context) async {
+    const email = 'QQ@QQ.QQ';
+    const password = 'QQQQQQ';
+
+    final result = await AuthService().login(email, password);
+
+    if (result == null) {
+      // Login exitoso
+      if (context.mounted) {
+        Navigator.pushReplacementNamed(context, '/home');
+      }
+    } else {
+      // Error en login
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result)),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +47,12 @@ class WelcomePage extends StatelessWidget {
             CustomButton(
               text: 'Ingresar',
               onPressed: () => Navigator.pushNamed(context, '/login'),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.grey),
+              onPressed: () => _loginAsGuest(context),
+              child: const Text('Ingresar como invitado (desarrollo)'),
             ),
             const SizedBox(height: 20),
             Column(

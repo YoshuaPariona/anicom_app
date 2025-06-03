@@ -3,49 +3,69 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<String?> registrar(String nombre, String correo, String contrasena) async {
+
+  // Registra un nuevo usuario con correo y contraseña, y guarda sus datos en Firestore
+  Future<String?> register(String name, String email, String password) async {
     try {
       UserCredential cred = await _auth.createUserWithEmailAndPassword(
-        email: correo,
-        password: contrasena,
+        email: email,
+        password: password,
       );
 
-      // Guardar datos del usuario en Firestore
-      await _firestore.collection('usuarios').doc(cred.user!.uid).set({
-        'uid': cred.user!.uid,
-        'correo': correo,
-        'nombre': nombre,
+      // Guardamos datos adicionales del usuario en Firestore
+      await FirebaseFirestore.instance.collection('usuarios').doc(cred.user!.uid).set({
+        'email': email.toLowerCase().trim(),
+        'name': name.trim(),
       });
 
-      return null; // éxito
+      return null; // Registro exitoso
+
     } on FirebaseAuthException catch (e) {
-      return e.code; // error específico
+      switch (e.code) {
+        case 'email-already-in-use':
+          return 'El correo electrónico ya está registrado.';
+        case 'invalid-email':
+          return 'El correo electrónico no es válido.';
+        case 'weak-password':
+          return 'La contraseña es demasiado débil (usa al menos 6 caracteres).';
+        default:
+          if (e.message != null && e.message!.contains('network error')) {
+            return 'No hay conexión a internet. Por favor verifica tu conexión.';
+          }
+          return 'Error al registrar: ${e.message}';
+      }
     } catch (e) {
-      return 'unknown'; // error no identificado
+      if (e.toString().toLowerCase().contains('network')) {
+        return 'No hay conexión a internet. Por favor verifica tu conexión.';
+      }
+      return 'Error inesperado: ${e.toString()}';
     }
   }
 
-  Future<String?> login(String correo, String contrasena) async {
+  // Inicia sesión con correo y contraseña
+  Future<String?> login(String email, String password) async {
     try {
-      await _auth.signInWithEmailAndPassword(
-        email: correo,
-        password: contrasena,
-      );
-      return null; // éxito
+      await _auth.signInWithEmailAndPassword(email: email, password: password);
+      return null;
     } on FirebaseAuthException catch (e) {
-      return e.code;
+      if (e.code == 'network-request-failed') {
+        return 'No hay conexión a internet. Por favor, verifica tu conexión.';
+      }
+      return 'Correo electrónico o contraseña incorrectos.';
     } catch (e) {
-      return 'unknown';
+      return 'Error inesperado: ${e.toString()}';
     }
   }
 
-  Future<void> cerrarSesion() async {
+  // Cierra la sesión del usuario actual
+  Future<void> signOut() async {
     await _auth.signOut();
   }
 
-  User? obtenerUsuarioActual() {
+  // Devuelve el usuario actual autenticado (si existe)
+  User? getCurrentUser() {
     return _auth.currentUser;
   }
+
 }

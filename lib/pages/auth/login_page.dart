@@ -12,12 +12,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
-  final _formKey = GlobalKey<FormState>();
-
-  // Variable para gestionar el estado de carga del botón
   bool _isLoading = false;
 
   Map<String, String?> errors = {
@@ -26,33 +23,42 @@ class _LoginPageState extends State<LoginPage> {
     'auth': null,
   };
 
-  // Refactorizamos la validación para manejar errores de manera global.
-  bool _validateField(String field, String value) {
-    setState(() {
-      errors[field] = null;
-    });
-
-    if (value.isEmpty) {
-      errors[field] = 'Este campo no puede estar vacío';
-      return false;
-    }
-
-    if (field == 'email' && !RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(value)) {
-      errors[field] = 'Formato de correo inválido';
-      return false;
-    }
-
-    return true;
+  @override
+  void initState() {
+    super.initState();
+    _emailController.addListener(() => _clearError('email'));
+    _passwordController.addListener(() => _clearError('password'));
   }
 
-  // Llamar a la validación global para todos los campos.
+  void _clearError(String field) {
+    final controller = field == 'email' ? _emailController : _passwordController;
+    if (errors[field] != null && controller.text.isNotEmpty) {
+      setState(() {
+        errors[field] = null;
+      });
+    }
+  }
+
+
   bool _validateFields() {
+    bool isValid = true;
+
     setState(() {
-      errors['email'] = _validateField('email', _emailController.text) ? null : errors['email'];
-      errors['password'] = _validateField('password', _passwordController.text) ? null : errors['password'];
+      if (_emailController.text.isEmpty) {
+        errors['email'] = 'Este campo no puede estar vacío';
+        isValid = false;
+      } else if (!RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(_emailController.text)) {
+        errors['email'] = 'Formato de correo inválido';
+        isValid = false;
+      }
+
+      if (_passwordController.text.isEmpty) {
+        errors['password'] = 'Este campo no puede estar vacío';
+        isValid = false;
+      }
     });
 
-    return errors['email'] == null && errors['password'] == null;
+    return isValid;
   }
 
   @override
@@ -74,7 +80,6 @@ class _LoginPageState extends State<LoginPage> {
             LogoImage(),
             SizedBox(height: 30),
             Form(
-              key: _formKey,
               child: Container(
                 padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -91,35 +96,19 @@ class _LoginPageState extends State<LoginPage> {
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(height: 20),
-                    // Campo de correo con validación en tiempo real
                     CustomTextField(
                       label: 'Correo',
                       controller: _emailController,
                       errorText: errors['email'],
-                      onChanged: (value) {
-                        setState(() {
-                          errors['email'] = null;
-                        });
-                      },
-                      validator: (value) {
-                        if (value != null && !RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(value)) {
-                          return 'Formato de correo inválido';
-                        }
-                        return null;
-                      },
+                      prefixIcon: Icons.email,
                     ),
                     SizedBox(height: 18),
-                    // Campo de contraseña con validación en tiempo real
                     CustomTextField(
                       label: 'Contraseña',
                       controller: _passwordController,
                       isPassword: true,
                       errorText: errors['password'],
-                      onChanged: (value) {
-                        setState(() {
-                          errors['password'] = null;
-                        });
-                      },
+                      prefixIcon: Icons.lock,
                     ),
                     SizedBox(height: 20),
                     if (errors['auth'] != null)
@@ -132,13 +121,12 @@ class _LoginPageState extends State<LoginPage> {
                     CustomButton(
                       text: 'Iniciar Sesión',
                       isLoading: _isLoading,
-                      onPressed: () async {
+                      onPressed: _isLoading ? null : () async {
                         if (_validateFields()) {
-                          setState(() {
-                            _isLoading = true;
-                          });
+                          setState(() => _isLoading = true);
 
-                          String? error = await AuthService().login(
+                          final authService = AuthService();
+                          String? error = await authService.login(
                             _emailController.text.trim(),
                             _passwordController.text,
                           );
@@ -146,6 +134,7 @@ class _LoginPageState extends State<LoginPage> {
                           if (error == null) {
                             setState(() {
                               errors['auth'] = null;
+                              _isLoading = false;
                             });
                             Navigator.pushReplacement(
                               context,
@@ -153,7 +142,7 @@ class _LoginPageState extends State<LoginPage> {
                             );
                           } else {
                             setState(() {
-                              errors['auth'] = 'El correo o la contraseña no son correctos.';
+                              errors['auth'] = error;
                               _isLoading = false;
                             });
                           }
@@ -167,7 +156,6 @@ class _LoginPageState extends State<LoginPage> {
                         Navigator.pushNamed(context, '/register');
                       },
                     ),
-                  
                   ],
                 ),
               ),

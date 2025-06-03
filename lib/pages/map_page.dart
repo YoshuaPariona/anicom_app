@@ -18,7 +18,7 @@ class _MapPageState extends State<MapPage> {
   GoogleMapController? mapController;
 
   Set<Polyline> routePolylines = {};
-  final String googleApiKey = "AIzaSyBIZrptkE0IGakPhzMzMpq4PaW_gw_D1vk";
+  final String googleApiKey = "";
 
 
   @override
