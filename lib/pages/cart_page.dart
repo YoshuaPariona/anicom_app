@@ -1,4 +1,4 @@
-import 'package:anicom_app/providers/cartProvider.dart';
+import 'package:anicom_app/providers/cart_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

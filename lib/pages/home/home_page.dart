@@ -1,7 +1,9 @@
-import 'package:anicom_app/pages/cartPage.dart';
-import 'package:anicom_app/pages/mapPage.dart';
+import 'package:anicom_app/pages/auth/login_page.dart';
+import 'package:anicom_app/pages/cart_page.dart';
+import 'package:anicom_app/pages/map_page.dart';
 import 'package:anicom_app/pages/placeholder.dart';
-import 'package:anicom_app/pages/productsPage.dart';
+import 'package:anicom_app/pages/products_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -29,11 +31,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int currentIndex = 0;
+  User? user;
+  String userName = "anicom_user";
 
   final List<Widget> pages = [
-    ProductsPage(), // Home
-    CartPage(), // Carrito
-    MapPage(), // Mapa
+    ProductsPage(),
+    CartPage(),
+    MapPage(),
     const PlaceholderPage(title: 'Pedidos', icon: Icons.refresh),
     const PlaceholderPage(title: 'Perfil', icon: Icons.person),
   ];
@@ -47,12 +51,32 @@ class _HomePageState extends State<HomePage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      userName = user!.email?.split('@').first ?? "usuario";
+    }
+  }
+
+  Future<void> cerrarSesion() async {
+    await FirebaseAuth.instance.signOut();
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => LoginPage()),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final String inicial = userName.isNotEmpty ? userName[0].toUpperCase() : 'A';
+
     return Scaffold(
       appBar: AppBar(
-        
         backgroundColor: const Color(0xFFF4DFF4),
-        centerTitle: true, 
+        centerTitle: true,
         automaticallyImplyLeading: true,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -78,18 +102,16 @@ class _HomePageState extends State<HomePage> {
       drawer: Drawer(
         child: Column(
           children: [
-            // Cabecera con perfil del usuario
             Container(
               padding: const EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 16),
               color: const Color(0xFFF4DFF4),
               child: Row(
                 children: [
-                  // Círculo con inicial
                   CircleAvatar(
                     radius: 30,
                     backgroundColor: Colors.white,
                     child: Text(
-                      'A', // <- Inicial del usuario (placeholder)
+                      inicial,
                       style: const TextStyle(
                         fontSize: 30,
                         color: Colors.pinkAccent,
@@ -98,43 +120,39 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   const SizedBox(width: 16),
-                  // Nombre de usuario
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'anico_user', // <- Nombre de usuario (placeholder)
-                      style: TextStyle(
-                        fontSize: 18,
-                      ),
+                      userName,
+                      style: const TextStyle(fontSize: 18),
                     ),
                   )
                 ],
               ),
             ),
-
-            // Opciones debajo
             Expanded(
               child: ListView(
-                children: const [
-                  ListTile(
+                children: [
+                  const ListTile(
                     leading: Icon(Icons.language),
                     title: Text('Lenguaje'),
                   ),
-                  ListTile(
+                  const ListTile(
                     leading: Icon(Icons.notifications),
                     title: Text('Notificaciones'),
                   ),
-                  ListTile(
+                  const ListTile(
                     leading: Icon(Icons.settings),
                     title: Text('Configuraciones'),
                   ),
-                  ListTile(
+                  const ListTile(
                     leading: Icon(Icons.payment),
                     title: Text('Métodos de pago'),
                   ),
-                  Divider(),
+                  const Divider(),
                   ListTile(
-                    leading: Icon(Icons.exit_to_app),
-                    title: Text('Cerrar sesión'),
+                    leading: const Icon(Icons.exit_to_app),
+                    title: const Text('Cerrar sesión'),
+                    onTap: cerrarSesion,
                   ),
                 ],
               ),

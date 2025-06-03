@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:anicom_app/models/product.dart';
-import 'package:anicom_app/providers/cartProvider.dart';
+import 'package:anicom_app/providers/cart_provider.dart';
 
 class ProductsPage extends StatefulWidget {
   const ProductsPage({super.key});

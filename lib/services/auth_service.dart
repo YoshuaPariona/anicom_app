@@ -5,33 +5,47 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<String?> register(String username, String email, String password) async {
+  Future<String?> registrar(String nombre, String correo, String contrasena) async {
     try {
-      // Crea usuario en Firebase Auth
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
+      UserCredential cred = await _auth.createUserWithEmailAndPassword(
+        email: correo,
+        password: contrasena,
       );
 
-      // Guarda datos en Firestore
-      await _firestore.collection('usuarios').doc(userCredential.user!.uid).set({
-        'username': username,
-        'email': email,
-        'uid': userCredential.user!.uid,
+      // Guardar datos del usuario en Firestore
+      await _firestore.collection('usuarios').doc(cred.user!.uid).set({
+        'uid': cred.user!.uid,
+        'correo': correo,
+        'nombre': nombre,
       });
 
-      return null; // Éxito
+      return null; // éxito
+    } on FirebaseAuthException catch (e) {
+      return e.code; // error específico
     } catch (e) {
-      return e.toString();
+      return 'unknown'; // error no identificado
     }
   }
 
-  Future<String?> login(String email, String password) async {
+  Future<String?> login(String correo, String contrasena) async {
     try {
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
-      return null; // Éxito
+      await _auth.signInWithEmailAndPassword(
+        email: correo,
+        password: contrasena,
+      );
+      return null; // éxito
+    } on FirebaseAuthException catch (e) {
+      return e.code;
     } catch (e) {
-      return e.toString();
+      return 'unknown';
     }
+  }
+
+  Future<void> cerrarSesion() async {
+    await _auth.signOut();
+  }
+
+  User? obtenerUsuarioActual() {
+    return _auth.currentUser;
   }
 }

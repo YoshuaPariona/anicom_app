@@ -1,4 +1,8 @@
-import 'package:anicom_app/pages/homePage.dart';
+import 'package:anicom_app/pages/home/home_page.dart';
+import 'package:anicom_app/widgets/custom_button.dart';
+import 'package:anicom_app/widgets/custom_link_text.dart';
+import 'package:anicom_app/widgets/custom_text_field.dart';
+import 'package:anicom_app/widgets/logo_image.dart';
 import 'package:flutter/material.dart';
 import 'package:anicom_app/services/auth_service.dart';
 
@@ -67,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           children: [
             SizedBox(height: 50),
-            Image.asset('assets/logo.png', width: 250),
+            LogoImage(),
             SizedBox(height: 30),
             Form(
               key: _formKey,
@@ -88,16 +92,13 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     SizedBox(height: 20),
                     // Campo de correo con validación en tiempo real
-                    TextFormField(
+                    CustomTextField(
+                      label: 'Correo',
                       controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
-                        labelText: 'Correo',
-                        errorText: errors['email'],
-                      ),
+                      errorText: errors['email'],
                       onChanged: (value) {
                         setState(() {
-                          errors['email'] = null; // Limpiar el error mientras escribe
+                          errors['email'] = null;
                         });
                       },
                       validator: (value) {
@@ -107,18 +108,16 @@ class _LoginPageState extends State<LoginPage> {
                         return null;
                       },
                     ),
-                    SizedBox(height: 16),
+                    SizedBox(height: 18),
                     // Campo de contraseña con validación en tiempo real
-                    TextFormField(
+                    CustomTextField(
+                      label: 'Contraseña',
                       controller: _passwordController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        labelText: 'Contraseña',
-                        errorText: errors['password'],
-                      ),
+                      isPassword: true,
+                      errorText: errors['password'],
                       onChanged: (value) {
                         setState(() {
-                          errors['password'] = null; // Limpiar el error mientras escribe
+                          errors['password'] = null;
                         });
                       },
                     ),
@@ -130,8 +129,10 @@ class _LoginPageState extends State<LoginPage> {
                         textAlign: TextAlign.center,
                       ),
                     SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: _isLoading ? null : () async {
+                    CustomButton(
+                      text: 'Iniciar Sesión',
+                      isLoading: _isLoading,
+                      onPressed: () async {
                         if (_validateFields()) {
                           setState(() {
                             _isLoading = true;
@@ -146,8 +147,6 @@ class _LoginPageState extends State<LoginPage> {
                             setState(() {
                               errors['auth'] = null;
                             });
-
-                            // Esperar a que la pantalla de inicio cargue todo
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(builder: (_) => HomePage()),
@@ -160,39 +159,15 @@ class _LoginPageState extends State<LoginPage> {
                           }
                         }
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFFA96B5A),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12.0),
-                        child: _isLoading
-                            ? CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                              )
-                            : Text('Iniciar Sesión'),
-                      ),
                     ),
-                    TextButton(
+                    CustomLinkText(
+                      text: '¿No tienes una cuenta? ',
+                      linkText: 'Regístrate',
                       onPressed: () {
                         Navigator.pushNamed(context, '/register');
                       },
-                      child: RichText(
-                        text: TextSpan(
-                          text: '¿No tienes una cuenta? ',
-                          style: TextStyle(color: Colors.black),
-                          children: [
-                            TextSpan(
-                              text: 'Regístrate',
-                              style: TextStyle(color: Colors.pink),
-                            ),
-                          ],
-                        ),
-                      ),
                     ),
+                  
                   ],
                 ),
               ),
