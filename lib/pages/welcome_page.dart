@@ -7,8 +7,8 @@ class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
 
   Future<void> _loginAsGuest(BuildContext context) async {
-    const email = 'QQ@QQ.QQ';
-    const password = 'QQQQQQ';
+    const email = 'user@gmail.com';
+    const password = 'password';
 
     final result = await AuthService().login(email, password);
 

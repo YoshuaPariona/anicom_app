@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class PlaceholderPage extends StatelessWidget {
+class OrderHistoryScreen extends StatelessWidget {
   final String title;
   final IconData icon;
 
-  const PlaceholderPage({
+  const OrderHistoryScreen({
     super.key,
-    required this.title,
+    this.title = 'Historial de Pedidos', // título opcional
     this.icon = Icons.construction, // icono opcional
   });
 
