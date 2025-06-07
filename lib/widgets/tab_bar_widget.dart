@@ -105,8 +105,14 @@ class _RoundedRectanglePainter extends BoxPainter {
 class TabBarViewWidget extends StatelessWidget {
   final TabController tabController;
   final List<Product> products;
+  final Function(Product) onAddToCart; // Añade esta línea para recibir la función
 
-  const TabBarViewWidget({Key? key, required this.tabController, required this.products}) : super(key: key);
+  const TabBarViewWidget({
+    Key? key,
+    required this.tabController,
+    required this.products,
+    required this.onAddToCart, // Asegúrate de pasar esta función cuando crees TabBarViewWidget
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -123,9 +129,10 @@ class TabBarViewWidget extends StatelessWidget {
       children: categorizedProducts.entries.map((entry) {
         return ProductGridWidget(
           products: entry.value,
-          onAddToCart: () {},
+          onAddToCart: onAddToCart, // Pasa la función onAddToCart aquí
         );
       }).toList(),
     );
   }
 }
+

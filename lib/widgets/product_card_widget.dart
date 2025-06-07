@@ -1,3 +1,4 @@
+//anicom_app/widgets/product_card_widget.dart
 import 'package:anicom_app/models/product.dart';
 import 'package:flutter/material.dart';
 
@@ -11,11 +12,26 @@ class ProductCardWidget extends StatelessWidget {
     required this.onAddToCart,
   });
 
-  Widget _buildImage() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(10),
+Widget _buildImage() {
+  String convertDriveLinkToDirect(String driveLink) {
+    final regExp = RegExp(r'/d/([a-zA-Z0-9_-]+)');
+    final match = regExp.firstMatch(driveLink);
+    if (match != null && match.groupCount >= 1) {
+      final id = match.group(1);
+      return 'https://drive.google.com/uc?export=view&id=$id';
+    } else {
+      return driveLink;
+    }
+  }
+
+  return ClipRRect(
+    borderRadius: BorderRadius.circular(10),
+    child: SizedBox(
+      width: 140,
+      height: 100,
       child: Container(
         decoration: const BoxDecoration(
+          color: Colors.white,
           boxShadow: [
             BoxShadow(
               color: Colors.black26,
@@ -24,32 +40,38 @@ class ProductCardWidget extends StatelessWidget {
             ),
           ],
         ),
-        child: Image.network(
-          product.imagen,
-          width: 140,
-          height: 100,
-          fit: BoxFit.cover,
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return const SizedBox(
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Indicador de carga
+            const CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.brown),
+            ),
+            // Imagen
+            Image.network(
+              convertDriveLinkToDirect(product.imagen),
               width: 140,
               height: 100,
-              child: Center(child: CircularProgressIndicator()),
-            );
-          },
-          errorBuilder: (context, error, stackTrace) {
-            return Container(
-              width: 140,
-              height: 100,
-              color: Colors.grey[300],
-              child: const Icon(Icons.broken_image, size: 50),
-            );
-          },
-          semanticLabel: 'Imagen del producto ${product.nombre}',
+              fit: BoxFit.cover,
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) {
+                  return child;
+                } else {
+                  return const SizedBox(); // Mantener el espacio reservado
+                }
+              },
+              errorBuilder: (context, error, stackTrace) {
+                return const Icon(Icons.broken_image, size: 50);
+              },
+              semanticLabel: 'Imagen del producto ${product.nombre}',
+            ),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildName() {
     return SizedBox(
@@ -93,11 +115,9 @@ class ProductCardWidget extends StatelessWidget {
         Icons.add_shopping_cart,
         color: Colors.white,
         size: 20,
-        semanticLabel: 'Agregar al carrito',
       ),
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -130,7 +150,6 @@ class ProductCardWidget extends StatelessWidget {
             child: Center(child: _buildName()),
           ),
           const SizedBox(height: 4),
-          
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

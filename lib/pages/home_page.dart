@@ -1,5 +1,5 @@
 import 'package:anicom_app/pages/auth/login_page.dart';
-import 'package:anicom_app/pages/cart_page.dart';
+import 'package:anicom_app/pages/screens/cart_screen.dart';
 import 'package:anicom_app/pages/map_page.dart';
 import 'package:anicom_app/pages/order_history_page.dart';
 import 'package:anicom_app/pages/screens/products_screen.dart';
@@ -48,7 +48,7 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> pages = const [
     ProductsScreen(),
-    CartPage(),
+    CartScreen(),
     OrderHistoryScreen(),
     MapPage(),
     UserPage(),

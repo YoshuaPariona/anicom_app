@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:anicom_app/models/product.dart';
+import 'package:flutter/material.dart';
+
 
 class CartProvider with ChangeNotifier {
   final Map<Product, int> _items = {};
@@ -12,6 +13,11 @@ class CartProvider with ChangeNotifier {
   }
 
   void removeProduct(Product product) {
+    _items.remove(product);
+    notifyListeners();
+  }
+
+  void decrementProduct(Product product) {
     if (!_items.containsKey(product)) return;
 
     if (_items[product]! > 1) {

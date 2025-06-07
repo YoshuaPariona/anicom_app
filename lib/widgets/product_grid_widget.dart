@@ -1,10 +1,11 @@
+//lib/widgets/product_grid_widget.dart
 import 'package:flutter/material.dart';
 import 'package:anicom_app/widgets/product_card_widget.dart';
 import 'package:anicom_app/models/product.dart';
 
 class ProductGridWidget extends StatelessWidget {
   final List<Product> products;
-  final VoidCallback onAddToCart;
+  final Function(Product) onAddToCart; // Cambia VoidCallback a Function(Product)
 
   const ProductGridWidget({
     super.key,
@@ -14,12 +15,11 @@ class ProductGridWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Si la lista de productos está vacía, mostramos un mensaje
     if (products.isEmpty) {
       return Center(
         child: Text(
           'No hay productos disponibles',
-          style: Theme.of(context).textTheme.headlineMedium, // Cambiado a headlineMedium
+          style: Theme.of(context).textTheme.headlineMedium,
         ),
       );
     }
@@ -30,16 +30,16 @@ class ProductGridWidget extends StatelessWidget {
         padding: const EdgeInsets.only(top: 16, bottom: 8),
         itemCount: products.length,
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2, // Número de columnas
-          childAspectRatio: 0.72, // Proporción entre el alto y el ancho de cada celda
-          crossAxisSpacing: 12, // Espaciado entre columnas
-          mainAxisSpacing: 12, // Espaciado entre filas
+          crossAxisCount: 2,
+          childAspectRatio: 0.72,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
         ),
         itemBuilder: (context, index) {
           final product = products[index];
           return ProductCardWidget(
             product: product,
-            onAddToCart: onAddToCart,
+            onAddToCart: () => onAddToCart(product), // Pasa la función con el producto específico
           );
         },
       ),
