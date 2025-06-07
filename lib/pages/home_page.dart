@@ -1,13 +1,14 @@
 import 'package:anicom_app/pages/auth/login_page.dart';
-import 'package:anicom_app/pages/screens/cart_screen.dart';
 import 'package:anicom_app/pages/map_page.dart';
-import 'package:anicom_app/pages/order_history_page.dart';
+import 'package:anicom_app/pages/screens/cart_screen.dart';
+import 'package:anicom_app/pages/screens/order_history_screen.dart';
 import 'package:anicom_app/pages/screens/products_screen.dart';
 import 'package:anicom_app/pages/user_page.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:convert'; // Asegúrate de importar esta biblioteca para usar base64Decode
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +35,7 @@ class AppColors {
   static const Color unselectedItemColor = Colors.grey;
   static const Color textColor = Colors.black87;
 }
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -123,8 +125,22 @@ class _HomePageState extends State<HomePage> {
           : null,
       builder: (context, snapshot) {
         String userName = "anicom_user";
+        String? imagenBase64;
+
         if (snapshot.hasData && snapshot.data != null) {
-          userName = (snapshot.data!.data() as Map<String, dynamic>?)?['name'] ?? "anicom_user";
+          final data = snapshot.data!.data() as Map<String, dynamic>?;
+          userName = data?['name'] ?? "anicom_user";
+          imagenBase64 = data?['fotoPerfilBase64'];
+        }
+
+        ImageProvider<Object>? imageProvider;
+        if (imagenBase64 != null) {
+          try {
+            final bytes = base64Decode(imagenBase64);
+            imageProvider = MemoryImage(bytes);
+          } catch (e) {
+            imageProvider = null;
+          }
         }
 
         final String initial = userName.isNotEmpty ? userName[0].toUpperCase() : 'A';
@@ -169,15 +185,17 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       CircleAvatar(
                         radius: 30,
-                        backgroundColor: Colors.white,
-                        child: Text(
-                          initial,
-                          style: const TextStyle(
-                            fontSize: 30,
-                            color: AppColors.selectedItemColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        backgroundImage: imageProvider,
+                        child: imageProvider == null
+                            ? Text(
+                                initial,
+                                style: const TextStyle(
+                                  fontSize: 30,
+                                  color: AppColors.selectedItemColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              )
+                            : null,
                       ),
                       const SizedBox(width: 16),
                       Expanded(
