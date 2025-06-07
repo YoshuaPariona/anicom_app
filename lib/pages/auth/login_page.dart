@@ -1,4 +1,4 @@
-import 'package:anicom_app/pages/home/home_page.dart';
+import 'package:anicom_app/pages/home_page.dart';
 import 'package:anicom_app/widgets/custom_button.dart';
 import 'package:anicom_app/widgets/custom_link_text.dart';
 import 'package:anicom_app/widgets/custom_text_field.dart';

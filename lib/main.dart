@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'pages/auth/login_page.dart';
 import 'pages/auth/register_page.dart';
 import 'pages/welcome_page.dart';
-import 'pages/home/home_page.dart';
+import 'pages/home_page.dart';
 import 'providers/cart_provider.dart';
 
 void main() async {

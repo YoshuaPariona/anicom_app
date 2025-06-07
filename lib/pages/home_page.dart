@@ -2,7 +2,7 @@ import 'package:anicom_app/pages/auth/login_page.dart';
 import 'package:anicom_app/pages/cart_page.dart';
 import 'package:anicom_app/pages/map_page.dart';
 import 'package:anicom_app/pages/order_history_page.dart';
-import 'package:anicom_app/pages/products_page.dart';
+import 'package:anicom_app/pages/screens/products_screen.dart';
 import 'package:anicom_app/pages/user_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -36,7 +36,7 @@ class _HomePageState extends State<HomePage> {
   User? user;
 
   final List<Widget> pages = [
-    ProductsPage(),
+    ProductsScreen(),
     CartPage(),
     OrderHistoryScreen(),
     MapPage(),
