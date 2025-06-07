@@ -1,0 +1,7 @@
+Al tocar el modo desarrollador, tienes estas crenciales
+- Correo: user@gmail.com
+- Contraseña: password
+
+Otra cuenta registrada es:
+- Correo: yoshua@gmail.com
+- Contraseña: 123456

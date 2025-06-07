@@ -12,24 +12,23 @@ class ProductCardWidget extends StatelessWidget {
     required this.onAddToCart,
   });
 
-Widget _buildImage() {
-  String convertDriveLinkToDirect(String driveLink) {
-    final regExp = RegExp(r'/d/([a-zA-Z0-9_-]+)');
-    final match = regExp.firstMatch(driveLink);
-    if (match != null && match.groupCount >= 1) {
-      final id = match.group(1);
-      return 'https://drive.google.com/uc?export=view&id=$id';
-    } else {
-      return driveLink;
+  Widget _buildImage() {
+    String convertDriveLinkToDirect(String driveLink) {
+      final regExp = RegExp(r'/d/([a-zA-Z0-9_-]+)');
+      final match = regExp.firstMatch(driveLink);
+      if (match != null && match.groupCount >= 1) {
+        final id = match.group(1);
+        return 'https://drive.google.com/uc?export=view&id=$id';
+      } else {
+        return driveLink;
+      }
     }
-  }
 
-  return ClipRRect(
-    borderRadius: BorderRadius.circular(10),
-    child: SizedBox(
-      width: 140,
-      height: 100,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(10),
       child: Container(
+        width: double.infinity,
+        height: 120,
         decoration: const BoxDecoration(
           color: Colors.white,
           boxShadow: [
@@ -43,21 +42,19 @@ Widget _buildImage() {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // Indicador de carga
             const CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Colors.brown),
             ),
-            // Imagen
             Image.network(
               convertDriveLinkToDirect(product.imagen),
-              width: 140,
-              height: 100,
+              width: double.infinity,
+              height: double.infinity,
               fit: BoxFit.cover,
               loadingBuilder: (context, child, loadingProgress) {
                 if (loadingProgress == null) {
                   return child;
                 } else {
-                  return const SizedBox(); // Mantener el espacio reservado
+                  return const SizedBox();
                 }
               },
               errorBuilder: (context, error, stackTrace) {
@@ -68,14 +65,12 @@ Widget _buildImage() {
           ],
         ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   Widget _buildName() {
-    return SizedBox(
-      width: 120,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Text(
         product.nombre,
         textAlign: TextAlign.center,
@@ -85,7 +80,7 @@ Widget _buildImage() {
           color: Colors.black87,
         ),
         overflow: TextOverflow.ellipsis,
-        maxLines: 3, // Cambiado a 3 líneas
+        maxLines: 2,
       ),
     );
   }
@@ -106,10 +101,11 @@ Widget _buildImage() {
       onPressed: onAddToCart,
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.brown,
+        minimumSize: const Size(56, 36),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(4.0),
       ),
       child: const Icon(
         Icons.add_shopping_cart,
@@ -118,6 +114,7 @@ Widget _buildImage() {
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -139,24 +136,27 @@ Widget _buildImage() {
           ),
         ],
       ),
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+      margin: const EdgeInsets.all(8.0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildImage(),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           SizedBox(
-            height: 60,
+            height: 40,
             child: Center(child: _buildName()),
           ),
-          const SizedBox(height: 4),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _buildPrice(),
-              const SizedBox(width: 12),
-              _buildAddButton(),
-            ],
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SizedBox(width: 0.5),
+                _buildPrice(),
+                _buildAddButton(),
+              ],
+            ),
           ),
         ],
       ),

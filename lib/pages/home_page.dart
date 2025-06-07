@@ -150,9 +150,24 @@ class _HomePageState extends State<HomePage> {
             backgroundColor: AppColors.backgroundColor,
             elevation: 0,
             leading: Builder(
-              builder: (context) => IconButton(
-                icon: const Icon(Icons.menu, color: AppColors.textColor),
-                onPressed: () => Scaffold.of(context).openDrawer(),
+              builder: (context) => Container(
+                margin: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: IconButton(
+                  icon: const Icon(Icons.menu, color: AppColors.selectedItemColor),
+                  onPressed: () => Scaffold.of(context).openDrawer(),
+                ),
               ),
             ),
             title: Text(
@@ -204,6 +219,10 @@ class _HomePageState extends State<HomePage> {
                           style: const TextStyle(fontSize: 18),
                         ),
                       ),
+                      IconButton(
+                        icon: const Icon(Icons.exit_to_app, color: Colors.red),
+                        onPressed: confirmarCerrarSesion,
+                      ),
                     ],
                   ),
                 ),
@@ -229,11 +248,6 @@ class _HomePageState extends State<HomePage> {
                       Divider(),
                     ],
                   ),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.exit_to_app),
-                  title: const Text('Cerrar sesión'),
-                  onTap: confirmarCerrarSesion,
                 ),
               ],
             ),

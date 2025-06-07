@@ -15,7 +15,6 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     final historialRef = FirebaseFirestore.instance
         .collection('usuarios')
         .doc(user?.uid)
@@ -23,7 +22,9 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         .orderBy('fecha', descending: true);
 
     return Scaffold(
-
+      appBar: AppBar(
+        title: const Text('Historial de Pedidos'),
+      ),
       body: StreamBuilder<QuerySnapshot>(
         stream: historialRef.snapshots(),
         builder: (context, snapshot) {
@@ -44,8 +45,11 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
             itemBuilder: (context, index) {
               final pedido = docs[index].data() as Map<String, dynamic>;
               final fechaTimestamp = pedido['fecha'] as Timestamp?;
+
+              // Ajustar la fecha a GMT-5
               final fecha = fechaTimestamp != null
-                  ? DateFormat('dd/MM/yyyy HH:mm').format(fechaTimestamp.toDate())
+                  ? DateFormat('dd/MM/yyyy HH:mm').format(
+                      fechaTimestamp.toDate().toLocal().subtract(const Duration(hours: 5)))
                   : 'Fecha desconocida';
 
               final productos = List<Map<String, dynamic>>.from(pedido['productos'] ?? []);

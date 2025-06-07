@@ -6,10 +6,15 @@ import 'package:anicom_app/models/product.dart';
 import 'package:anicom_app/providers/cart_provider.dart';
 import 'package:anicom_app/widgets/cart_item_card_widget.dart';
 
-class CartScreen extends StatelessWidget {
+class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
 
-  Future<void> _saveOrderToFirestore(BuildContext context) async {
+  @override
+  State<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
+  Future<void> _saveOrderToFirestore() async {
     final user = FirebaseAuth.instance.currentUser;
     final cartProvider = Provider.of<CartProvider>(context, listen: false);
 
@@ -44,13 +49,19 @@ class CartScreen extends StatelessWidget {
       // Limpiar el carrito después de guardar el pedido
       cartProvider.clear();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Pedido realizado con éxito')),
-      );
+      // Verificar si el widget está montado antes de mostrar el SnackBar
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Pedido realizado con éxito')),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al realizar el pedido: $e')),
-      );
+      // Verificar si el widget está montado antes de mostrar el SnackBar
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al realizar el pedido: $e')),
+        );
+      }
     }
   }
 
@@ -64,76 +75,100 @@ class CartScreen extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16.0),
-              itemCount: cartItems.length,
-              itemBuilder: (context, index) {
-                final product = cartItems.keys.elementAt(index);
-                final quantity = cartItems[product]!;
+            child: cartItems.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.add_shopping_cart, // Icono de carrito de compras
+                          size: 60,
+                          color: Colors.grey,
+                        ),
+                        const SizedBox(height: 10), // Espacio entre el icono y el texto
+                        const Text(
+                          'Añade productos para comenzar',
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
 
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 16.0),
-                  child: CartItemCardWidget(
-                    product: product,
-                    quantity: quantity,
-                    onRemoveFromCart: () {
-                      cartProvider.removeProduct(product);
-                    },
-                    onIncrement: () {
-                      cartProvider.addProduct(product);
-                    },
-                    onDecrement: () {
-                      cartProvider.decrementProduct(product);
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16.0),
+                    itemCount: cartItems.length,
+                    itemBuilder: (context, index) {
+                      final product = cartItems.keys.elementAt(index);
+                      final quantity = cartItems[product]!;
+
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: CartItemCardWidget(
+                          product: product,
+                          quantity: quantity,
+                          onRemoveFromCart: () {
+                            cartProvider.removeProduct(product);
+                          },
+                          onIncrement: () {
+                            cartProvider.addProduct(product);
+                          },
+                          onDecrement: () {
+                            cartProvider.decrementProduct(product);
+                          },
+                        ),
+                      );
                     },
                   ),
-                );
-              },
-            ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Total:',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+          if (cartItems.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Total:',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    Text(
-                      'S/. ${cartProvider.total.toStringAsFixed(2)}',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                      Text(
+                        'S/. ${cartProvider.total.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => _saveOrderToFirestore(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.brown,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    child: const Text(
-                      'Comprar',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _saveOrderToFirestore,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.brown,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: const Text(
+                        'Comprar',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 40),
+                ],
+              ),
             ),
-          ),
         ],
       ),
     );

@@ -37,7 +37,7 @@ class _UserPageState extends State<UserPage> {
         .get();
 
     final data = doc.data();
-    if (data != null) {
+    if (data != null && mounted) {
       setState(() {
         nombre = data['name'] ?? '';
         imagenBase64 = data['fotoPerfilBase64'];

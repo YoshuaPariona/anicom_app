@@ -40,11 +40,11 @@ class _MapPageState extends State<MapPage> {
     if (permission == LocationPermission.deniedForever) return;
 
     Position position = await Geolocator.getCurrentPosition();
-
-    setState(() {
-      userLocation = LatLng(position.latitude, position.longitude);
-    });
-
+    if (mounted) {
+      setState(() {
+        userLocation = LatLng(position.latitude, position.longitude);
+      });
+    }
     if (storeLocation != null) {
       fetchRoute();
     }
@@ -57,40 +57,49 @@ class _MapPageState extends State<MapPage> {
 
     if (data != null && data['tienda'] != null) {
       final geoPoint = data['tienda'] as GeoPoint;
-      setState(() {
-        storeLocation = LatLng(geoPoint.latitude, geoPoint.longitude);
-      });
+      if (mounted) {
+        setState(() {
+          storeLocation = LatLng(geoPoint.latitude, geoPoint.longitude);
+        });
+      }
       if (userLocation != null) {
         fetchRoute();
       }
     }
   }
+
   Future<void> fetchRoute() async {
-    final origin = "${userLocation!.latitude},${userLocation!.longitude}";
-    final destination = "${storeLocation!.latitude},${storeLocation!.longitude}";
+  // Verificar que userLocation y storeLocation no sean null
+  if (userLocation == null || storeLocation == null) {
+    print("Ubicación del usuario o de la tienda es nula.");
+    return;
+  }
 
-    final url = Uri.parse(
-        "https://maps.googleapis.com/maps/api/directions/json?origin=$origin&destination=$destination&key=$googleApiKey&mode=driving");
+  final origin = "${userLocation!.latitude},${userLocation!.longitude}";
+  final destination = "${storeLocation!.latitude},${storeLocation!.longitude}";
 
-    print("🛰️ Solicitando ruta a la URL:");
-    print(url.toString());
+  final url = Uri.parse(
+      "https://maps.googleapis.com/maps/api/directions/json?origin=$origin&destination=$destination&key=$googleApiKey&mode=driving");
 
-    final response = await http.get(url);
+  print("🛰️ Solicitando ruta a la URL:");
+  print(url.toString());
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
+  final response = await http.get(url);
 
-      final routes = data["routes"];
-      if (routes == null || routes.isEmpty) {
-        print("❌ No se encontraron rutas.");
-        print("📦 Respuesta del servidor:");
-        print(response.body);
-        return;
-      }
+  if (response.statusCode == 200) {
+    final data = json.decode(response.body);
 
-      final points = routes[0]["overview_polyline"]["points"];
-      final route = decodePolyline(points);
+    final routes = data["routes"];
+    if (routes == null || routes.isEmpty) {
+      print("❌ No se encontraron rutas.");
+      print("📦 Respuesta del servidor:");
+      print(response.body);
+      return;
+    }
 
+    final points = routes[0]["overview_polyline"]["points"];
+    final route = decodePolyline(points);
+    if (mounted) {
       setState(() {
         routePolylines = {
           Polyline(
@@ -101,11 +110,12 @@ class _MapPageState extends State<MapPage> {
           ),
         };
       });
-    } else {
-      print("❌ Error HTTP ${response.statusCode}");
-      print(response.body);
     }
+  } else {
+    print("❌ Error HTTP ${response.statusCode}");
+    print(response.body);
   }
+}
 
 
 
@@ -163,7 +173,7 @@ class _MapPageState extends State<MapPage> {
                 Marker(
                   markerId: const MarkerId('store'),
                   position: storeLocation!,
-                  infoWindow: const InfoWindow(title: 'FarmaVida S.A.C.'),
+                  infoWindow: const InfoWindow(title: 'Tienda Anicom'),
                 ),
               },
               polylines: routePolylines,

@@ -80,7 +80,6 @@ class _ProductsScreenState extends State<ProductsScreen>
     }
   }
 
-
   void _filterProducts(String query) {
     setState(() {
       _filteredProducts = _products.where((product) {
@@ -94,17 +93,6 @@ class _ProductsScreenState extends State<ProductsScreen>
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('${product.nombre} añadido al carrito')),
     );
-  }
-
-  String convertDriveLinkToDirect(String driveLink) {
-    final regExp = RegExp(r'/d/([a-zA-Z0-9_-]+)');
-    final match = regExp.firstMatch(driveLink);
-    if (match != null && match.groupCount >= 1) {
-      final id = match.group(1);
-      return 'https://drive.google.com/uc?export=view&id=$id';
-    } else {
-      return driveLink; // Si no coincide con el patrón, devuelve el enlace original
-    }
   }
 
   @override
@@ -128,18 +116,21 @@ class _ProductsScreenState extends State<ProductsScreen>
             Expanded(
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
-                  : TabBarViewWidget(
-                      tabController: _tabController,
-                      products: _products,
-                      onAddToCart: (product) {
-                        // Lógica para añadir el producto al carrito
-                        Provider.of<CartProvider>(context, listen: false).addProduct(product);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('${product.nombre} añadido al carrito')),
-                        );
-                      },
+                  : TabBarView(
+                      controller: _tabController,
+                      children: categories.map((category) {
+                        final categoryProducts = _filteredProducts
+                            .where((product) => product.categoria == category)
+                            .toList();
+                        return categoryProducts.isEmpty
+                            ? const Center(
+                                child: Text('No se encontraron productos'))
+                            : ProductGridWidget(
+                                products: categoryProducts,
+                                onAddToCart: _addToCart,
+                              );
+                      }).toList(),
                     ),
-
             ),
           ],
         ),
