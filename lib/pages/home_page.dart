@@ -9,24 +9,35 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Anicom App',
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      home: const HomePage(),
     );
   }
 }
 
+class AppColors {
+  static const Color backgroundColor = Color(0xFFF4DFF4);
+  static const Color selectedItemColor = Color.fromARGB(255, 131, 66, 42);
+  static const Color unselectedItemColor = Colors.grey;
+  static const Color textColor = Colors.black87;
+}
+
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
   State<HomePage> createState() => _HomePageState();
 }
@@ -35,7 +46,7 @@ class _HomePageState extends State<HomePage> {
   int currentIndex = 0;
   User? user;
 
-  final List<Widget> pages = [
+  final List<Widget> pages = const [
     ProductsScreen(),
     CartPage(),
     OrderHistoryScreen(),
@@ -43,7 +54,7 @@ class _HomePageState extends State<HomePage> {
     UserPage(),
   ];
 
-  final List<String> titles = [
+  final List<String> titles = const [
     'Inicio',
     'Carrito',
     'Pedidos',
@@ -57,7 +68,6 @@ class _HomePageState extends State<HomePage> {
     user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
-      // Usuario no autenticado: redirige al login
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.pushReplacement(
           context,
@@ -67,27 +77,24 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // Función que muestra el diálogo de confirmación para cerrar sesión
   Future<void> confirmarCerrarSesion() async {
-    showDialog(
+    return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('¿Estás seguro?'),
-          content: Text('¿Deseas cerrar sesión?'),
+          title: const Text('¿Estás seguro?'),
+          content: const Text('¿Deseas cerrar sesión?'),
           actions: <Widget>[
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Cierra el diálogo
-              },
-              child: Text('Cancelar'),
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancelar'),
             ),
             TextButton(
               onPressed: () async {
-                Navigator.of(context).pop(); // Cierra el diálogo
+                Navigator.of(context).pop();
                 await cerrarSesion();
               },
-              child: Text('Cerrar sesión'),
+              child: const Text('Cerrar sesión'),
             ),
           ],
         );
@@ -95,7 +102,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // Función para cerrar sesión
   Future<void> cerrarSesion() async {
     await FirebaseAuth.instance.signOut();
     if (mounted) {
@@ -118,20 +124,18 @@ class _HomePageState extends State<HomePage> {
       builder: (context, snapshot) {
         String userName = "anicom_user";
         if (snapshot.hasData && snapshot.data != null) {
-          var data = snapshot.data!.data() as Map<String, dynamic>?;
-          userName = data?['name'] ?? "anicom_user";
+          userName = (snapshot.data!.data() as Map<String, dynamic>?)?['name'] ?? "anicom_user";
         }
 
-        final String inicial =
-            userName.isNotEmpty ? userName[0].toUpperCase() : 'A';
+        final String initial = userName.isNotEmpty ? userName[0].toUpperCase() : 'A';
 
         return Scaffold(
           appBar: AppBar(
-            backgroundColor: const Color(0xFFF4DFF4),
+            backgroundColor: AppColors.backgroundColor,
             elevation: 0,
             leading: Builder(
               builder: (context) => IconButton(
-                icon: const Icon(Icons.menu, color: Colors.black87),
+                icon: const Icon(Icons.menu, color: AppColors.textColor),
                 onPressed: () => Scaffold.of(context).openDrawer(),
               ),
             ),
@@ -140,7 +144,7 @@ class _HomePageState extends State<HomePage> {
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: AppColors.textColor,
               ),
             ),
             centerTitle: true,
@@ -160,17 +164,17 @@ class _HomePageState extends State<HomePage> {
                 Container(
                   padding: const EdgeInsets.only(
                       top: 40, left: 16, right: 16, bottom: 16),
-                  color: const Color(0xFFF4DFF4),
+                  color: AppColors.backgroundColor,
                   child: Row(
                     children: [
                       CircleAvatar(
                         radius: 30,
                         backgroundColor: Colors.white,
                         child: Text(
-                          inicial,
+                          initial,
                           style: const TextStyle(
                             fontSize: 30,
-                            color: Colors.pinkAccent,
+                            color: AppColors.selectedItemColor,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -181,37 +185,37 @@ class _HomePageState extends State<HomePage> {
                           userName,
                           style: const TextStyle(fontSize: 18),
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),
                 Expanded(
                   child: ListView(
-                    children: [
-                      const ListTile(
+                    children: const [
+                      ListTile(
                         leading: Icon(Icons.language),
                         title: Text('Lenguaje'),
                       ),
-                      const ListTile(
+                      ListTile(
                         leading: Icon(Icons.notifications),
                         title: Text('Notificaciones'),
                       ),
-                      const ListTile(
+                      ListTile(
                         leading: Icon(Icons.settings),
                         title: Text('Configuraciones'),
                       ),
-                      const ListTile(
+                      ListTile(
                         leading: Icon(Icons.payment),
                         title: Text('Métodos de pago'),
                       ),
-                      const Divider(),
-                      ListTile(
-                        leading: const Icon(Icons.exit_to_app),
-                        title: const Text('Cerrar sesión'),
-                        onTap: confirmarCerrarSesion,
-                      ),
+                      Divider(),
                     ],
                   ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.exit_to_app),
+                  title: const Text('Cerrar sesión'),
+                  onTap: confirmarCerrarSesion,
                 ),
               ],
             ),
@@ -224,8 +228,8 @@ class _HomePageState extends State<HomePage> {
                 currentIndex = index;
               });
             },
-            selectedItemColor: Colors.teal,
-            unselectedItemColor: Colors.grey,
+            selectedItemColor: AppColors.selectedItemColor,
+            unselectedItemColor: AppColors.unselectedItemColor,
             type: BottomNavigationBarType.fixed,
             items: const [
               BottomNavigationBarItem(

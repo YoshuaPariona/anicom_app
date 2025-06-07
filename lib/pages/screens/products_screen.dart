@@ -1,93 +1,101 @@
-// products_screen.dart
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
+import 'package:anicom_app/models/product.dart';
+import 'package:anicom_app/providers/cart_provider.dart';
 import 'package:anicom_app/widgets/product_grid_widget.dart';
 import 'package:anicom_app/widgets/search_bar_widget.dart';
-import 'package:anicom_app/models/product.dart';
-import 'package:anicom_app/widgets/tab_bar_widget.dart'; // Importamos el archivo tab_bar_widget.dart
+import 'package:anicom_app/widgets/tab_bar_widget.dart';
 
 class ProductsScreen extends StatefulWidget {
+  const ProductsScreen({super.key});
+
   @override
   _ProductsScreenState createState() => _ProductsScreenState();
 }
 
-class _ProductsScreenState extends State<ProductsScreen> with SingleTickerProviderStateMixin {
+class _ProductsScreenState extends State<ProductsScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool _isSearchActive = false;
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
+  List<Product> _products = [];
+  List<Product> _filteredProducts = [];
+  bool _isLoading = true;
 
-  // Lista de productos de ejemplo (placeholders)
-  List<Product> _getSampleProducts() {
-    return [
-      Product(
-        id: '1',
-        nombre: 'Producto de ejemplo 1',
-        descripcion: 'Descripción del producto de ejemplo 1',
-        imagen: 'https://via.placeholder.com/150',
-        precio: 10.99,
-        categoria: 'Accesorios',
-      ),
-      Product(
-        id: '2',
-        nombre: 'Producto de ejemplo 2',
-        descripcion: 'Descripción del producto de ejemplo 2',
-        imagen: 'https://via.placeholder.com/150',
-        precio: 15.99,
-        categoria: 'Accesorios',
-      ),
-      Product(
-        id: '3',
-        nombre: 'Producto de ejemplo 3',
-        descripcion: 'Descripción del producto de ejemplo 3',
-        imagen: 'https://via.placeholder.com/150',
-        precio: 20.99,
-        categoria: 'Accesorios',
-      ),
-      Product(
-        id: '4',
-        nombre: 'Producto de ejemplo 4',
-        descripcion: 'Descripción del producto de ejemplo 4',
-        imagen: 'https://via.placeholder.com/150',
-        precio: 5.99,
-        categoria: 'Accesorios',
-      ),
-      Product(
-        id: '5',
-        nombre: 'Producto de ejemplo 5',
-        descripcion: 'Descripción del producto de ejemplo 5',
-        imagen: 'https://via.placeholder.com/150',
-        precio: 12.99,
-        categoria: 'Accesorios',
-      ),
-    ];
-  }
+  final List<String> categories = [
+    'Accesorios',
+    'Comida',
+    'Cosplay',
+    'Figuras',
+    'Ropa',
+  ];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 5, vsync: this);
+    _tabController = TabController(length: categories.length, vsync: this);
+    _fetchProducts();
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _tabController.dispose();
     super.dispose();
   }
 
-  void _toggleSearch() {
+  Future<void> _fetchProducts() async {
+    try {
+      List<Product> allProducts = [];
+
+      for (String category in categories) {
+        QuerySnapshot snapshot = await FirebaseFirestore.instance
+            .collection(category.toLowerCase())
+            .get();
+
+        allProducts.addAll(snapshot.docs.map((doc) {
+          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+          data['id'] = doc.id;
+          data['categoria'] = category;
+          return Product.fromMap(data);
+        }));
+      }
+
+      setState(() {
+        _products = allProducts;
+        _filteredProducts = allProducts;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      print('Error fetching products: $e');
+    }
+  }
+
+  void _filterProducts(String query) {
     setState(() {
-      _isSearchActive = !_isSearchActive;
+      _filteredProducts = _products.where((product) {
+        return product.nombre.toLowerCase().contains(query.toLowerCase());
+      }).toList();
     });
+  }
+
+  void _addToCart(Product product) {
+    Provider.of<CartProvider>(context, listen: false).addProduct(product);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${product.nombre} añadido al carrito')),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Product> placeholderProducts = _getSampleProducts(); // Obtenemos los productos de ejemplo
-
-    return Container(
-      color: const Color(0xFFF4DFF4),
-      child: SafeArea(
+    return Scaffold(
+      backgroundColor: const Color(0xFFF4DFF4),
+      body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SearchBarWidget(
               isSearchActive: _isSearchActive,
@@ -96,14 +104,29 @@ class _ProductsScreenState extends State<ProductsScreen> with SingleTickerProvid
                 setState(() {
                   _isSearchActive = query.isNotEmpty;
                 });
+                _filterProducts(query);
               },
             ),
-            CustomTabBar(tabController: _tabController), // Usamos el widget separado para el TabBar
+            CustomTabBar(tabController: _tabController),
             Expanded(
-              child: TabBarViewWidget(
-                tabController: _tabController,
-                products: placeholderProducts, // Pasamos los productos al TabBarViewWidget
-              ),
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : TabBarView(
+                      controller: _tabController,
+                      children: categories.map((category) {
+                        final categoryProducts = _filteredProducts
+                            .where((product) => product.categoria == category)
+                            .toList();
+                        return categoryProducts.isEmpty
+                            ? const Center(
+                                child: Text('No se encontraron productos'))
+                            : ProductGridWidget(
+                                products: categoryProducts,
+                                onAddToCart: () =>
+                                    _addToCart(categoryProducts.first),
+                              );
+                      }).toList(),
+                    ),
             ),
           ],
         ),

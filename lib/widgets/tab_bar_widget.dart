@@ -4,7 +4,7 @@ import 'package:anicom_app/models/product.dart';
 
 // Constantes para los estilos
 const Color _tabBarBackgroundColor = Color(0xFFF4DFF4);
-const Color _selectedLabelColor = Colors.brown;
+const Color _selectedLabelColor = Color.fromARGB(255, 131, 66, 42);
 const Color _unselectedLabelColor = Colors.grey;
 const double _indicatorWeight = 4.0;
 const double _fontSize = 16.0;

@@ -11,7 +11,6 @@ class ProductCardWidget extends StatelessWidget {
     required this.onAddToCart,
   });
 
-  /// Construye la imagen del producto con borde redondeado y sombra.
   Widget _buildImage() {
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
@@ -52,23 +51,23 @@ class ProductCardWidget extends StatelessWidget {
     );
   }
 
-  /// Construye el nombre del producto con sombra.
   Widget _buildName() {
-    return Text(
-      product.nombre,
-      textAlign: TextAlign.center,
-      style: const TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.bold,
-        color: Colors.black87,
-        shadows: [
-          Shadow(offset: Offset(0.5, 0.5), blurRadius: 2, color: Colors.black26),
-        ],
+    return SizedBox(
+      width: 120,
+      child: Text(
+        product.nombre,
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+          color: Colors.black87,
+        ),
+        overflow: TextOverflow.ellipsis,
+        maxLines: 3, // Cambiado a 3 líneas
       ),
     );
   }
 
-  /// Muestra el precio del producto en formato de moneda.
   Widget _buildPrice() {
     return Text(
       'S/. ${product.precio.toStringAsFixed(2)}',
@@ -80,7 +79,6 @@ class ProductCardWidget extends StatelessWidget {
     );
   }
 
-  /// Botón para agregar al carrito con ícono.
   Widget _buildAddButton() {
     return ElevatedButton(
       onPressed: onAddToCart,
@@ -94,7 +92,7 @@ class ProductCardWidget extends StatelessWidget {
       child: const Icon(
         Icons.add_shopping_cart,
         color: Colors.white,
-        size: 24,
+        size: 20,
         semanticLabel: 'Agregar al carrito',
       ),
     );
@@ -128,14 +126,16 @@ class ProductCardWidget extends StatelessWidget {
           _buildImage(),
           const SizedBox(height: 12),
           SizedBox(
-            height: 64,
+            height: 60,
             child: Center(child: _buildName()),
           ),
+          const SizedBox(height: 4),
+          
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               _buildPrice(),
-              const SizedBox(width: 16),
+              const SizedBox(width: 12),
               _buildAddButton(),
             ],
           ),
