@@ -49,12 +49,14 @@ class WelcomePage extends StatelessWidget {
               onPressed: () => Navigator.pushNamed(context, '/login'),
             ),
             const SizedBox(height: 20),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.grey),
-              onPressed: () => _loginAsGuest(context),
-              child: const Text('Ingresar como desarrollador'),
-            ),
-            const SizedBox(height: 20),
+
+            // ElevatedButton(
+            //   style: ElevatedButton.styleFrom(backgroundColor: Colors.grey),
+            //   onPressed: () => _loginAsGuest(context),
+            //   child: const Text('Ingresar como desarrollador'),
+            // ),
+            // const SizedBox(height: 20),
+
             Column(
               children: [
                 const Text(
