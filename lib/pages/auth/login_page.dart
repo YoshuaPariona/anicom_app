@@ -1,11 +1,15 @@
+// lib/pages/auth/login_page.dart
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:anicom_app/controllers/login_controller.dart';
 import 'package:anicom_app/pages/home_page.dart';
+import 'package:anicom_app/services/auth_service.dart';
 import 'package:anicom_app/widgets/custom_button.dart';
 import 'package:anicom_app/widgets/custom_link_text.dart';
 import 'package:anicom_app/widgets/custom_text_field.dart';
 import 'package:anicom_app/widgets/logo_image.dart';
-import 'package:flutter/material.dart';
-import 'package:anicom_app/services/auth_service.dart';
 
+/// Página de inicio de sesión que permite a los usuarios autenticarse en la aplicación.
 class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -14,51 +18,106 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-
   bool _isLoading = false;
-
-  Map<String, String?> errors = {
-    'email': null,
-    'password': null,
-    'auth': null,
-  };
+  late LoginController _loginController;
 
   @override
   void initState() {
     super.initState();
+    final authService = Provider.of<AuthService>(context, listen: false);
+    _loginController = LoginController(authService: authService);
+
     _emailController.addListener(() => _clearError('email'));
     _passwordController.addListener(() => _clearError('password'));
   }
 
+  /// Limpia el mensaje de error de un campo específico.
+  ///
+  /// [field] El campo del cual se limpiará el error.
   void _clearError(String field) {
-    final controller = field == 'email' ? _emailController : _passwordController;
-    if (errors[field] != null && controller.text.isNotEmpty) {
-      setState(() {
-        errors[field] = null;
-      });
-    }
+    setState(() {
+      _loginController.clearError(field, field == 'email' ? _emailController : _passwordController);
+    });
   }
 
+  /// Construye y devuelve el widget del formulario de inicio de sesión.
+  Widget _buildFormCard() {
+    return Container(
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Color(0xFFFDF4ED),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.blueAccent),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            '¡Bienvenido a Anicom!',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 20),
+          CustomTextField(
+            label: 'Correo',
+            controller: _emailController,
+            errorText: _loginController.errors['email'],
+            prefixIcon: Icons.email,
+          ),
+          SizedBox(height: 18),
+          CustomTextField(
+            label: 'Contraseña',
+            controller: _passwordController,
+            isPassword: true,
+            errorText: _loginController.errors['password'],
+            prefixIcon: Icons.lock,
+          ),
+          SizedBox(height: 20),
+          if (_loginController.errors['auth'] != null)
+            Text(
+              _loginController.errors['auth']!,
+              style: TextStyle(color: Colors.red),
+              textAlign: TextAlign.center,
+            ),
+          SizedBox(height: 16),
+          CustomButton(
+            text: 'Iniciar Sesión',
+            isLoading: _isLoading,
+            onPressed: _isLoading ? null : _handleLogin,
+          ),
+          CustomLinkText(
+            text: '¿No tienes una cuenta? ',
+            linkText: 'Regístrate',
+            onPressed: () {
+              Navigator.pushNamed(context, '/register');
+            },
+          ),
+        ],
+      ),
+    );
+  }
 
-  bool _validateFields() {
-    bool isValid = true;
+  /// Maneja el proceso de inicio de sesión cuando se presiona el botón de inicio de sesión.
+  Future<void> _handleLogin() async {
+    setState(() => _isLoading = true);
 
-    setState(() {
-      if (_emailController.text.isEmpty) {
-        errors['email'] = 'Este campo no puede estar vacío';
-        isValid = false;
-      } else if (!RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$").hasMatch(_emailController.text)) {
-        errors['email'] = 'Formato de correo inválido';
-        isValid = false;
-      }
+    String? error = await _loginController.handleLogin(_emailController, _passwordController);
 
-      if (_passwordController.text.isEmpty) {
-        errors['password'] = 'Este campo no puede estar vacío';
-        isValid = false;
-      }
-    });
-
-    return isValid;
+    if (error == null) {
+      setState(() {
+        _loginController.errors['auth'] = null;
+        _isLoading = false;
+      });
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => HomePage()),
+      );
+    } else {
+      setState(() {
+        _loginController.errors['auth'] = error;
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -80,85 +139,7 @@ class _LoginPageState extends State<LoginPage> {
             LogoImage(),
             SizedBox(height: 30),
             Form(
-              child: Container(
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Color(0xFFFDF4ED),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.blueAccent),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      '¡Bienvenido a Anicom!',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: 20),
-                    CustomTextField(
-                      label: 'Correo',
-                      controller: _emailController,
-                      errorText: errors['email'],
-                      prefixIcon: Icons.email,
-                    ),
-                    SizedBox(height: 18),
-                    CustomTextField(
-                      label: 'Contraseña',
-                      controller: _passwordController,
-                      isPassword: true,
-                      errorText: errors['password'],
-                      prefixIcon: Icons.lock,
-                    ),
-                    SizedBox(height: 20),
-                    if (errors['auth'] != null)
-                      Text(
-                        errors['auth']!,
-                        style: TextStyle(color: Colors.red),
-                        textAlign: TextAlign.center,
-                      ),
-                    SizedBox(height: 16),
-                    CustomButton(
-                      text: 'Iniciar Sesión',
-                      isLoading: _isLoading,
-                      onPressed: _isLoading ? null : () async {
-                        if (_validateFields()) {
-                          setState(() => _isLoading = true);
-
-                          final authService = AuthService();
-                          String? error = await authService.login(
-                            _emailController.text.trim(),
-                            _passwordController.text,
-                          );
-
-                          if (error == null) {
-                            setState(() {
-                              errors['auth'] = null;
-                              _isLoading = false;
-                            });
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (_) => HomePage()),
-                            );
-                          } else {
-                            setState(() {
-                              errors['auth'] = error;
-                              _isLoading = false;
-                            });
-                          }
-                        }
-                      },
-                    ),
-                    CustomLinkText(
-                      text: '¿No tienes una cuenta? ',
-                      linkText: 'Regístrate',
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/register');
-                      },
-                    ),
-                  ],
-                ),
-              ),
+              child: _buildFormCard(),
             ),
           ],
         ),
