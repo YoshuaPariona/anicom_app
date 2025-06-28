@@ -62,7 +62,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   void _startInactivityTimer() {
     _cancelTimers();
-    _inactivityTimer = Timer(const Duration(seconds: 30), () {
+    _inactivityTimer = Timer(const Duration(seconds: 300), () {
       _showInactivityWarningDialog();
     });
   }
@@ -96,7 +96,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       ),
     );
 
-    _warningTimer = Timer(const Duration(seconds: 30), () {
+    _warningTimer = Timer(const Duration(seconds: 100), () {
       Navigator.of(navigatorKey.currentContext!, rootNavigator: true).pop();
       _signOutWithMessage("Sesión cerrada por inactividad");
     });

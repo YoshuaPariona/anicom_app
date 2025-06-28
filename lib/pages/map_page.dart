@@ -18,7 +18,7 @@ class _MapPageState extends State<MapPage> {
   GoogleMapController? mapController;
 
   Set<Polyline> routePolylines = {};
-  final String googleApiKey = "";
+  final String googleApiKey = "AIzaSyBIZrptkE0IGakPhzMzMpq4PaW_gw_D1vk";
 
 
   @override
@@ -104,7 +104,7 @@ class _MapPageState extends State<MapPage> {
         routePolylines = {
           Polyline(
             polylineId: const PolylineId("route"),
-            color: Colors.blue,
+            color: Colors.brown,
             width: 5,
             points: route,
           ),
