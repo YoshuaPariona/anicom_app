@@ -50,12 +50,12 @@ class WelcomePage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // ElevatedButton(
-            //   style: ElevatedButton.styleFrom(backgroundColor: Colors.grey),
-            //   onPressed: () => _loginAsGuest(context),
-            //   child: const Text('Ingresar como desarrollador'),
-            // ),
-            // const SizedBox(height: 20),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.grey),
+              onPressed: () => _loginAsGuest(context),
+              child: const Text('Ingresar como desarrollador'),
+            ),
+            const SizedBox(height: 20),
 
             Column(
               children: [

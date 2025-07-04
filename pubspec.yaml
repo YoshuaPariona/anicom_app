@@ -26,6 +26,7 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   flutter_launcher_icons: ^0.13.1
   shared_preferences: ^2.2.2
+  sensors_plus: ^4.0.0
 
 flutter_launcher_icons:
   android: true
@@ -34,6 +35,7 @@ flutter_launcher_icons:
   remove_alpha_ios: true
   background_color: "#efb9e6"
   adaptive_icon_background: "#efb9e6"
+  flutter_admin_scaffold: ^2.0.1
 
 flutter:
   uses-material-design: true

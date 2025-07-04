@@ -1,8 +1,10 @@
+// lib/pages/home_page.dart
 import 'package:anicom_app/pages/auth/login_page.dart';
 import 'package:anicom_app/pages/map_page.dart';
 import 'package:anicom_app/pages/screens/cart_screen.dart';
 import 'package:anicom_app/pages/screens/order_history_screen.dart';
 import 'package:anicom_app/pages/screens/products_screen.dart';
+import 'package:anicom_app/pages/sensors_page.dart';
 import 'package:anicom_app/pages/user_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -193,8 +195,7 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               children: [
                 Container(
-                  padding: const EdgeInsets.only(
-                      top: 40, left: 16, right: 16, bottom: 16),
+                  padding: const EdgeInsets.only(top: 40, left: 16, right: 16, bottom: 16),
                   color: AppColors.backgroundColor,
                   child: Row(
                     children: [
@@ -224,34 +225,29 @@ class _HomePageState extends State<HomePage> {
                         onPressed: confirmarCerrarSesion,
                       ),
                     ],
-                  ),
-                ),
+                  ),),
                 Expanded(
                   child: ListView(
-                    children: const [
+                    children: [
                       ListTile(
-                        leading: Icon(Icons.language),
-                        title: Text('Lenguaje'),
+                        leading: const Icon(Icons.sensors),
+                        title: const Text('Sensores'),
+                        onTap: () {
+                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const SensorsPage()),
+                          );
+                        },
                       ),
-                      ListTile(
-                        leading: Icon(Icons.notifications),
-                        title: Text('Notificaciones'),
-                      ),
-                      ListTile(
-                        leading: Icon(Icons.settings),
-                        title: Text('Configuraciones'),
-                      ),
-                      ListTile(
-                        leading: Icon(Icons.payment),
-                        title: Text('Métodos de pago'),
-                      ),
-                      Divider(),
+                      const Divider(),
                     ],
                   ),
                 ),
               ],
             ),
           ),
+
           body: pages[currentIndex],
           bottomNavigationBar: BottomNavigationBar(
             currentIndex: currentIndex,
