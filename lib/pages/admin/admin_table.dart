@@ -2,14 +2,22 @@
 import 'package:anicom_app/pages/admin/admin_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 void _launchURL(String url) async {
-  final Uri uri = Uri.parse(url);
-  if (await canLaunchUrl(uri)) {
-    await launchUrl(uri);
-  } else {
-    throw 'Could not launch $url';
+  if (!url.startsWith('http')) {
+    url = 'https://$url';
+  }
+  try {
+    final success = await launchUrlString(
+      url,
+      webOnlyWindowName: '_blank',
+    );
+    if (!success) {
+      debugPrint('Could not launch $url');
+    }
+  } catch (e) {
+    debugPrint('Error launching URL: $e');
   }
 }
 

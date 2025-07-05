@@ -104,7 +104,7 @@ class _MapPageState extends State<MapPage> {
         routePolylines = {
           Polyline(
             polylineId: const PolylineId("route"),
-            color: Colors.blue,
+            color: Colors.brown.shade300,
             width: 5,
             points: route,
           ),
@@ -116,8 +116,6 @@ class _MapPageState extends State<MapPage> {
     print(response.body);
   }
 }
-
-
 
   List<LatLng> decodePolyline(String encoded) {
     List<LatLng> polyline = [];
@@ -174,8 +172,10 @@ class _MapPageState extends State<MapPage> {
                   markerId: const MarkerId('store'),
                   position: storeLocation!,
                   infoWindow: const InfoWindow(title: 'Tienda Anicom'),
+                  icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRose),
                 ),
               },
+
               polylines: routePolylines,
               onMapCreated: (controller) => mapController = controller,
             ),

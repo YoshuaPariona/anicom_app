@@ -1,4 +1,5 @@
 //lib/widgets/product_grid_widget.dart
+import 'package:anicom_app/pages/screens/product_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:anicom_app/widgets/product_card_widget.dart';
 import 'package:anicom_app/models/product.dart';
@@ -39,7 +40,18 @@ class ProductGridWidget extends StatelessWidget {
           final product = products[index];
           return ProductCardWidget(
             product: product,
-            onAddToCart: () => onAddToCart(product), // Pasa la función con el producto específico
+            onAddToCart: () => onAddToCart(product),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProductDetailScreen(
+                    product: product,
+                    allProducts: products,
+                  ),
+                ),
+              );
+            },
           );
         },
       ),

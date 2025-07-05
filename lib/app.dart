@@ -1,6 +1,5 @@
 // lib/app.dart
 import 'dart:async';
-import 'package:anicom_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';

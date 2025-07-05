@@ -5,13 +5,15 @@ import 'package:flutter/material.dart';
 class ProductCardWidget extends StatelessWidget {
   final Product product;
   final VoidCallback onAddToCart;
+  final VoidCallback onTap;
+
 
   const ProductCardWidget({
-    super.key,
-    required this.product,
-    required this.onAddToCart,
-  });
-
+  super.key,
+  required this.product,
+  required this.onAddToCart,
+  required this.onTap,
+});
   Widget _buildImage() {
     String convertDriveLinkToDirect(String driveLink) {
       final regExp = RegExp(r'/d/([a-zA-Z0-9_-]+)');
@@ -117,48 +119,51 @@ class ProductCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.white.withAlpha((255 * 0.9).toInt()),
-            Colors.grey.shade100.withAlpha((255 * 0.8).toInt()),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black26,
-            offset: Offset(0, 4),
-            blurRadius: 6,
+    return GestureDetector(
+      onTap: onTap, // Llama al callback de navegación
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.white.withAlpha((255 * 0.9).toInt()),
+              Colors.grey.shade100.withAlpha((255 * 0.8).toInt()),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-        ],
-      ),
-      margin: const EdgeInsets.all(8.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildImage(),
-          const SizedBox(height: 8),
-          SizedBox(
-            height: 35,
-            child: Center(child: _buildName()),
-          ),
-          const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                SizedBox(width: 0.5),
-                _buildPrice(),
-                _buildAddButton(),
-              ],
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black26,
+              offset: Offset(0, 4),
+              blurRadius: 6,
             ),
-          ),
-        ],
+          ],
+        ),
+        margin: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildImage(),
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 35,
+              child: Center(child: _buildName()),
+            ),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const SizedBox(width: 0.5),
+                  _buildPrice(),
+                  _buildAddButton(),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
