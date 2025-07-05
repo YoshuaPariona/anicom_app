@@ -16,6 +16,7 @@ class AuthService {
   /// Constructor interno para crear la instancia singleton.
   AuthService._internal();
 
+  Stream<User?> get authStateChange => _auth.authStateChanges();
   /// Mapa de mensajes de error centralizados para manejar errores comunes de autenticación.
   static const Map<String, String> authErrors = {
     'email-already-in-use': 'El correo ya está registrado.',

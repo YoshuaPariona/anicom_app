@@ -1,0 +1,33 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "anicom-app",
+          "appId": "1:727775604654:android:3984d46b47f249c34ba23f",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "anicom-app",
+          "configurations": {
+            "android": "1:727775604654:android:3984d46b47f249c34ba23f",
+            "ios": "1:727775604654:ios:b0a4866df3ab9da54ba23f",
+            "macos": "1:727775604654:ios:b0a4866df3ab9da54ba23f",
+            "web": "1:727775604654:web:7b162cf3592c9ea74ba23f",
+            "windows": "1:727775604654:web:86c6e2231ddfedfd4ba23f"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}

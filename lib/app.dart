@@ -13,6 +13,8 @@ import 'providers/cart_provider.dart';
 import 'services/inactivity_service.dart';
 import 'app_routes.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 /// Widget principal de la aplicación que gestiona el estado y el ciclo de vida de la app.
 class MyApp extends StatefulWidget {
   /// Crea una instancia de [MyApp].

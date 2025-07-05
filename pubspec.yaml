@@ -12,13 +12,14 @@ dependencies:
   firebase_core: ^3.13.1
   firebase_database: ^11.3.6
   cloud_firestore: ^5.6.8
+  firebase_auth: ^5.5.4
   provider: ^6.0.5
   geolocator: ^14.0.1
   http: ^1.2.1
   image_picker: ^1.1.2
   google_maps_flutter: ^2.6.0
-  firebase_auth: ^5.5.4
   intl: ^0.20.2
+  flutter_admin_scaffold: ^1.0.0
 
 dev_dependencies:
   flutter_test:
@@ -27,6 +28,7 @@ dev_dependencies:
   flutter_launcher_icons: ^0.13.1
   shared_preferences: ^2.2.2
   sensors_plus: ^4.0.0
+  url_launcher: ^6.1.7
 
 flutter_launcher_icons:
   android: true
@@ -35,7 +37,6 @@ flutter_launcher_icons:
   remove_alpha_ios: true
   background_color: "#efb9e6"
   adaptive_icon_background: "#efb9e6"
-  flutter_admin_scaffold: ^2.0.1
 
 flutter:
   uses-material-design: true
