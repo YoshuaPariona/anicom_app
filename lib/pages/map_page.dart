@@ -104,7 +104,7 @@ class _MapPageState extends State<MapPage> {
         routePolylines = {
           Polyline(
             polylineId: const PolylineId("route"),
-            color: Colors.blue,
+            color: Colors.brown,
             width: 5,
             points: route,
           ),
